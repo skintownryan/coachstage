@@ -3,591 +3,570 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Drill Importer — CoachStage</title>
+<title>Drill Builder — CoachStage</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: #F5F0E8;
-    --ink: #1A1A18;
-    --ink-soft: #3D3D38;
-    --ink-muted: #7A7A72;
-    --green: #4A9B6F;
-    --green-bg: #E6F4ED;
-    --green-border: #8DCCA8;
-    --red: #C03030;
-    --red-bg: #FDEAEA;
-    --red-border: #F0A0A0;
-    --amber: #9A6A00;
-    --amber-bg: #FEF3D0;
-    --amber-border: #F0C878;
-    --radius: 12px;
-    --radius-sm: 8px;
+    --cream: #F5F0E8; --ink: #1A1A18; --ink-soft: #3D3D38; --ink-muted: #7A7A72;
+    --green: #4A9B6F; --green-bg: #E6F4ED; --green-border: #8DCCA8;
+    --red: #C03030; --red-bg: #FDEAEA; --red-border: #F0A0A0;
+    --amber: #9A6A00; --amber-bg: #FEF3D0; --amber-border: #F0C878;
+    --stage-1: #E8A838; --stage-1-bg: #FDF4E0; --stage-1-border: #F0C878;
+    --stage-2: #4A9B6F; --stage-2-bg: #E6F4ED; --stage-2-border: #8DCCA8;
+    --stage-3: #3A7AC8; --stage-3-bg: #E4EEF9; --stage-3-border: #85B3E8;
+    --stage-4: #8B4DC8; --stage-4-bg: #EFE8F9; --stage-4-border: #BFA0E0;
+    --radius: 12px; --radius-sm: 8px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--ink);
-    min-height: 100vh;
-    font-size: 15px;
-    line-height: 1.6;
-  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--ink); min-height: 100vh; font-size: 15px; line-height: 1.6; }
 
-  nav {
-    position: sticky; top: 0; z-index: 100;
-    background: rgba(245,240,232,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(26,26,24,0.1);
-    padding: 0 24px;
-    display: flex; align-items: center; justify-content: space-between;
-    height: 60px;
-  }
-  .nav-logo {
-    font-family: 'DM Serif Display', serif;
-    font-size: 22px; color: var(--ink);
-    text-decoration: none;
-  }
+  nav { position: sticky; top: 0; z-index: 100; background: rgba(245,240,232,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(26,26,24,0.1); padding: 0 24px; display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .nav-logo { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--ink); text-decoration: none; }
   .nav-logo span { color: var(--green); }
-  .nav-back {
-    font-size: 13px; font-weight: 500; color: var(--ink-muted);
-    text-decoration: none; padding: 6px 14px; border-radius: 99px;
-    border: 1px solid rgba(26,26,24,0.15); background: white;
-    transition: all .15s;
-  }
+  .nav-right { display: flex; align-items: center; gap: 10px; }
+  .nav-back { font-size: 13px; font-weight: 500; color: var(--ink-muted); text-decoration: none; padding: 6px 14px; border-radius: 99px; border: 1px solid rgba(26,26,24,0.15); background: white; transition: all .15s; }
   .nav-back:hover { color: var(--ink); border-color: rgba(26,26,24,0.3); }
+  .settings-btn { font-size: 18px; background: none; border: none; cursor: pointer; padding: 6px 8px; color: var(--ink-muted); border-radius: 8px; transition: all .15s; }
+  .settings-btn:hover { background: rgba(26,26,24,0.06); color: var(--ink); }
 
-  .container { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+  .layout { display: grid; grid-template-columns: 1fr 320px; min-height: calc(100vh - 60px); }
+  .form-col { padding: 32px 32px 100px; border-right: 1px solid rgba(26,26,24,0.1); }
+  .preview-col { padding: 28px 20px; position: sticky; top: 60px; height: calc(100vh - 60px); overflow-y: auto; background: rgba(26,26,24,0.02); }
+  @media(max-width: 860px) { .layout { grid-template-columns: 1fr; } .preview-col { display: none; } }
 
-  .page-header { margin-bottom: 36px; }
-  .page-eyebrow {
-    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
-    color: var(--green); margin-bottom: 10px;
-    display: inline-block; padding: 3px 10px; border-radius: 99px;
-    background: var(--green-bg); border: 1px solid var(--green-border);
-  }
-  .page-header h1 {
-    font-family: 'DM Serif Display', serif;
-    font-size: 36px; line-height: 1.15; margin-bottom: 10px;
-  }
-  .page-header p { color: var(--ink-muted); font-size: 15px; max-width: 480px; }
+  .settings-overlay { display: none; position: fixed; inset: 0; background: rgba(26,26,24,0.4); z-index: 200; }
+  .settings-overlay.open { display: block; }
+  .settings-panel { position: absolute; top: 68px; right: 16px; background: white; border-radius: var(--radius); padding: 24px; width: 320px; box-shadow: 0 16px 48px rgba(26,26,24,0.15); }
+  .settings-panel h3 { font-size: 14px; font-weight: 600; margin-bottom: 16px; }
+  .sf { margin-bottom: 12px; }
+  .sf label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-muted); margin-bottom: 4px; }
+  .sf input { width: 100%; padding: 8px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(26,26,24,0.2); font-size: 12px; color: var(--ink); background: #fafafa; font-family: monospace; }
+  .sf input:focus { outline: none; border-color: var(--green); }
+  .sf input.ok { border-color: var(--green-border); background: var(--green-bg); }
+  .settings-note { font-size: 12px; color: var(--ink-muted); margin-top: 10px; line-height: 1.5; }
+  .settings-save { margin-top: 14px; width: 100%; padding: 10px; border-radius: var(--radius-sm); background: var(--ink); color: var(--cream); border: none; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; }
 
-  /* SETUP SECTION */
-  .setup-card {
-    background: var(--amber-bg); border: 1px solid var(--amber-border);
-    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 28px;
-  }
-  .setup-card h3 { font-size: 14px; font-weight: 600; color: var(--amber); margin-bottom: 12px; }
-  .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media(max-width:520px) { .setup-grid { grid-template-columns: 1fr; } }
-  .setup-field label {
-    display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;
-    letter-spacing: .08em; color: var(--amber); margin-bottom: 5px;
-  }
-  .setup-field input {
-    width: 100%; padding: 8px 12px; border-radius: var(--radius-sm);
-    border: 1px solid var(--amber-border); background: white;
-    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink);
-    font-family: monospace;
-  }
-  .setup-field input:focus { outline: none; border-color: var(--amber); }
-  .setup-field input.saved { border-color: var(--green-border); background: var(--green-bg); }
-  .setup-note { font-size: 12px; color: var(--amber); margin-top: 10px; }
+  .page-header { margin-bottom: 24px; }
+  .page-header h1 { font-family: 'DM Serif Display', serif; font-size: 28px; margin-bottom: 4px; }
+  .page-header p { color: var(--ink-muted); font-size: 14px; }
 
-  /* URL INPUT */
-  .url-section { margin-bottom: 28px; }
-  .url-section label {
-    display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;
-  }
-  .url-row { display: flex; gap: 10px; }
-  .url-input {
-    flex: 1; padding: 12px 16px; border-radius: var(--radius-sm);
-    border: 1px solid rgba(26,26,24,0.2); background: white;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
-  }
-  .url-input:focus { outline: none; border-color: var(--green); }
-  .btn {
-    padding: 12px 22px; border-radius: var(--radius-sm);
-    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
-    border: none; cursor: pointer; transition: all .15s; white-space: nowrap;
-  }
-  .btn-primary { background: var(--ink); color: var(--cream); }
-  .btn-primary:hover { background: #333; }
-  .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
-  .btn-green { background: var(--green); color: white; }
-  .btn-green:hover { background: #3a7d59; }
-  .btn-green:disabled { background: #ccc; cursor: not-allowed; }
+  .yt-box { background: white; border-radius: var(--radius); border: 1px solid rgba(26,26,24,0.1); padding: 18px; margin-bottom: 20px; }
+  .yt-box label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-muted); margin-bottom: 8px; }
+  .yt-row { display: flex; gap: 8px; }
+  .yt-input { flex: 1; padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(26,26,24,0.2); font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); background: #fafafa; }
+  .yt-input:focus { outline: none; border-color: var(--green); background: white; }
+  .fetch-btn { padding: 9px 16px; border-radius: var(--radius-sm); background: var(--ink); color: white; border: none; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+  .fetch-btn:hover { background: #333; }
+  .fetch-btn:disabled { background: #bbb; cursor: not-allowed; }
+  .yt-fetched { display: none; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(26,26,24,0.08); align-items: center; gap: 10px; }
+  .yt-fetched.show { display: flex; }
+  .yt-thumb { width: 72px; height: 48px; border-radius: 5px; object-fit: cover; }
+  .yt-meta { flex: 1; min-width: 0; }
+  .yt-meta strong { font-size: 13px; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .yt-meta span { font-size: 12px; color: var(--ink-muted); }
 
-  /* VIDEO PREVIEW */
-  .video-preview {
-    background: white; border-radius: var(--radius);
-    border: 1px solid rgba(26,26,24,0.1);
-    overflow: hidden; margin-bottom: 24px;
-    display: none;
-  }
-  .video-preview.visible { display: block; }
-  .preview-thumb {
-    position: relative; padding-bottom: 40%; background: #1a1a18; overflow: hidden;
-  }
-  .preview-thumb img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.8; }
-  .preview-thumb-overlay {
-    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  }
-  .yt-badge {
-    background: rgba(255,0,0,0.9); padding: 8px 16px; border-radius: 6px;
-    color: white; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;
-  }
-  .preview-info { padding: 16px 20px; }
-  .preview-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
-  .preview-meta { font-size: 13px; color: var(--ink-muted); }
+  .card { background: white; border-radius: var(--radius); border: 1px solid rgba(26,26,24,0.1); padding: 18px; margin-bottom: 14px; }
+  .card-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-muted); margin-bottom: 14px; }
 
-  /* FORM */
-  .drill-form { display: none; }
-  .drill-form.visible { display: block; }
-  .form-section { margin-bottom: 24px; }
-  .form-section-title {
-    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em;
-    color: var(--ink-muted); margin-bottom: 14px; padding-bottom: 8px;
-    border-bottom: 1px solid rgba(26,26,24,0.1);
-  }
-  .field { margin-bottom: 16px; }
-  .field label {
-    display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--ink-soft);
-  }
-  .field input, .field select, .field textarea {
-    width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
-    border: 1px solid rgba(26,26,24,0.18); background: white;
-    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
-    transition: border-color .15s;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    outline: none; border-color: var(--green);
-  }
-  .field textarea { resize: vertical; min-height: 80px; }
-  .field-hint { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-  @media(max-width:520px) { .field-row, .field-row-3 { grid-template-columns: 1fr; } }
+  .field { margin-bottom: 12px; }
+  .field:last-child { margin-bottom: 0; }
+  .field label { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 500; color: var(--ink-soft); margin-bottom: 5px; }
+  .cc { font-size: 11px; color: var(--ink-muted); font-weight: 400; }
+  .cc.warn { color: var(--red); }
+  .field input, .field select, .field textarea { width: 100%; padding: 9px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(26,26,24,0.18); background: #fafafa; font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink); transition: border-color .15s; }
+  .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--green); background: white; }
+  .field textarea { resize: vertical; min-height: 68px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-  /* INSTRUCTIONS */
-  .instructions-list { display: flex; flex-direction: column; gap: 8px; }
-  .instruction-row { display: flex; gap: 8px; align-items: flex-start; }
-  .instruction-num {
-    width: 24px; height: 24px; border-radius: 50%; background: var(--green-bg);
-    border: 1px solid var(--green-border); color: var(--green);
-    font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0; margin-top: 10px;
-  }
-  .instruction-row input { flex: 1; }
-  .remove-btn {
-    width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(26,26,24,0.15);
-    background: white; cursor: pointer; font-size: 14px; color: var(--ink-muted);
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 8px;
-    transition: all .15s;
-  }
-  .remove-btn:hover { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
-  .add-step-btn {
-    margin-top: 8px; padding: 8px 14px; border-radius: var(--radius-sm);
-    border: 1px dashed rgba(26,26,24,0.2); background: transparent;
-    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink-muted);
-    cursor: pointer; transition: all .15s; width: 100%;
-  }
-  .add-step-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+  .segment { display: flex; background: rgba(26,26,24,0.07); border-radius: 8px; padding: 3px; gap: 2px; }
+  .seg { flex: 1; padding: 7px 4px; border-radius: 6px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--ink-muted); cursor: pointer; transition: all .15s; text-align: center; line-height: 1.3; }
+  .seg.on { background: white; color: var(--ink); box-shadow: 0 1px 4px rgba(26,26,24,0.12); }
+  .seg.on.s1 { color: var(--stage-1); } .seg.on.s2 { color: var(--stage-2); } .seg.on.s3 { color: var(--stage-3); } .seg.on.s4 { color: var(--stage-4); }
 
-  /* STATUS */
-  .status { border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; margin-top: 16px; border: 1px solid; display: none; }
-  .status.visible { display: block; }
-  .status-success { background: var(--green-bg); border-color: var(--green-border); color: #1F5C3A; }
-  .status-error { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
-  .status-loading { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber); }
+  .presets { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
+  .preset { padding: 4px 12px; border-radius: 99px; font-size: 12px; border: 1.5px solid rgba(26,26,24,0.14); background: white; color: var(--ink-muted); cursor: pointer; transition: all .12s; }
+  .preset:hover { border-color: var(--green); color: var(--green); }
+  .preset.on { background: var(--green-bg); border-color: var(--green); color: var(--green); }
 
-  .form-actions { display: flex; gap: 12px; align-items: center; padding-top: 8px; }
-  .form-actions .hint { font-size: 13px; color: var(--ink-muted); }
+  .eq-tags { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 8px; }
+  .eq-tag { padding: 5px 11px; border-radius: 99px; font-size: 12px; font-weight: 500; border: 1.5px solid rgba(26,26,24,0.14); background: white; color: var(--ink-muted); cursor: pointer; transition: all .12s; }
+  .eq-tag:hover { border-color: var(--green); color: var(--green); }
+  .eq-tag.on { background: var(--green-bg); border-color: var(--green); color: var(--green); }
+  .eq-custom-row { display: flex; gap: 6px; }
+  .eq-custom-row input { flex: 1; padding: 6px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(26,26,24,0.18); font-family: 'DM Sans', sans-serif; font-size: 13px; background: #fafafa; }
+  .eq-custom-row input:focus { outline: none; border-color: var(--green); }
+  .eq-add { padding: 6px 12px; border-radius: var(--radius-sm); border: 1px solid rgba(26,26,24,0.18); background: white; font-family: 'DM Sans', sans-serif; font-size: 13px; cursor: pointer; color: var(--ink-muted); transition: all .12s; }
+  .eq-add:hover { border-color: var(--green); color: var(--green); }
 
-  footer {
-    border-top: 1px solid rgba(26,26,24,0.1);
-    padding: 24px; text-align: center;
-    font-size: 13px; color: var(--ink-muted);
-  }
+  .steps-list { display: flex; flex-direction: column; gap: 7px; margin-bottom: 8px; }
+  .step-row { display: flex; gap: 7px; align-items: center; }
+  .step-n { width: 22px; height: 22px; border-radius: 50%; background: var(--green-bg); border: 1px solid var(--green-border); color: var(--green); font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .step-input { flex: 1; padding: 7px 10px; border-radius: var(--radius-sm); border: 1px solid rgba(26,26,24,0.18); font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink); background: #fafafa; }
+  .step-input:focus { outline: none; border-color: var(--green); background: white; }
+  .step-del { width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgba(26,26,24,0.12); background: white; cursor: pointer; font-size: 16px; color: var(--ink-muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all .12s; line-height: 1; }
+  .step-del:hover { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+  .add-step { width: 100%; padding: 8px; border-radius: var(--radius-sm); border: 1.5px dashed rgba(26,26,24,0.16); background: none; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink-muted); cursor: pointer; transition: all .12s; }
+  .add-step:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+
+  .save-bar { position: fixed; bottom: 0; left: 0; right: 320px; background: rgba(245,240,232,0.96); backdrop-filter: blur(12px); border-top: 1px solid rgba(26,26,24,0.1); padding: 14px 32px; display: flex; align-items: center; gap: 12px; z-index: 50; }
+  .save-btn { padding: 11px 26px; border-radius: var(--radius-sm); background: var(--green); color: white; border: none; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .15s; }
+  .save-btn:hover { background: #3a7d59; }
+  .save-btn:disabled { background: #bbb; cursor: not-allowed; }
+  .clear-btn { padding: 11px 18px; border-radius: var(--radius-sm); border: 1px solid rgba(26,26,24,0.18); background: white; font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink-muted); cursor: pointer; transition: all .12s; }
+  .clear-btn:hover { border-color: rgba(26,26,24,0.3); color: var(--ink); }
+  .save-msg { font-size: 13px; color: var(--ink-muted); }
+  .save-msg.ok { color: var(--green); font-weight: 500; }
+  .save-msg.err { color: var(--red); }
+  @media(max-width: 860px) { .save-bar { right: 0; padding: 12px 16px; } }
+
+  .preview-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-muted); margin-bottom: 12px; }
+  .prev-card { background: white; border-radius: var(--radius); border: 1px solid rgba(26,26,24,0.12); overflow: hidden; margin-bottom: 14px; }
+  .prev-thumb { position: relative; padding-bottom: 56.25%; background: #E8E4DC; display: none; }
+  .prev-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .85; }
+  .prev-thumb .play { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; }
+  .play-dot { width: 36px; height: 36px; border-radius: 50%; background: rgba(255,0,0,0.9); display: flex; align-items: center; justify-content: center; }
+  .prev-body { padding: 13px 15px; }
+  .prev-badges { display: flex; gap: 6px; margin-bottom: 9px; }
+  .prev-sb { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 99px; border: 1px solid; }
+  .prev-tb { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: #F0EDE6; color: var(--ink-muted); border: 1px solid rgba(26,26,24,0.1); }
+  .prev-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; color: var(--ink); }
+  .prev-summary { font-size: 12px; color: var(--ink-muted); line-height: 1.55; margin-bottom: 9px; font-style: italic; }
+  .prev-summary.has-text { color: var(--ink-soft); font-style: normal; }
+  .prev-footer { display: flex; gap: 10px; }
+  .prev-stat { font-size: 11px; color: var(--ink-muted); }
+  .prev-hint { font-size: 12px; color: var(--ink-muted); line-height: 1.6; }
+
+  .inline-status { font-size: 13px; padding: 10px 14px; border-radius: var(--radius-sm); border: 1px solid; display: none; margin-top: 12px; }
+  .inline-status.show { display: block; }
+  .inline-status.ok { background: var(--green-bg); border-color: var(--green-border); color: #1F5C3A; }
+  .inline-status.err { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
 </style>
 </head>
 <body>
 
 <nav>
   <a href="/" class="nav-logo">Coach<span>Stage</span></a>
-  <a href="/" class="nav-back">← Back to site</a>
+  <div class="nav-right">
+    <a href="/" class="nav-back">← Back to site</a>
+    <button class="settings-btn" onclick="toggleSettings()" title="API Settings">⚙</button>
+  </div>
 </nav>
 
-<div class="container">
-
-  <div class="page-header">
-    <div class="page-eyebrow">Admin tool</div>
-    <h1>YouTube Drill Importer</h1>
-    <p>Paste a YouTube URL and we'll pull the video details to pre-fill your drill. Review and edit before saving.</p>
-  </div>
-
-  <!-- SETUP -->
-  <div class="setup-card">
-    <h3>⚙ One-time setup — your credentials are saved in this browser only</h3>
-    <div class="setup-grid">
-      <div class="setup-field">
-        <label>YouTube API Key</label>
-        <input type="password" id="yt-key" placeholder="AIzaSy..." oninput="saveKeys()">
-      </div>
-      <div class="setup-field">
-        <label>GitHub Token</label>
-        <input type="password" id="gh-token" placeholder="ghp_..." oninput="saveKeys()">
-      </div>
-    </div>
-    <div class="setup-field" style="margin-top:12px;">
-      <label>GitHub Repo (username/reponame)</label>
-      <input type="text" id="gh-repo" placeholder="skintownryan/coachstage" oninput="saveKeys()" style="font-family:'DM Sans',sans-serif;">
-    </div>
-    <p class="setup-note">These are stored only in your browser's localStorage and never sent anywhere except directly to YouTube and GitHub APIs.</p>
-  </div>
-
-  <!-- URL INPUT -->
-  <div class="url-section">
-    <label>YouTube URL</label>
-    <div class="url-row">
-      <input type="text" class="url-input" id="yt-url" placeholder="https://www.youtube.com/watch?v=..." />
-      <button class="btn btn-primary" onclick="fetchVideo()" id="fetch-btn">Fetch Video</button>
-    </div>
-  </div>
-
-  <!-- VIDEO PREVIEW -->
-  <div class="video-preview" id="video-preview">
-    <div class="preview-thumb">
-      <img id="preview-img" src="" alt="">
-      <div class="preview-thumb-overlay">
-        <div class="yt-badge">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="white"><polygon points="4,2 12,7 4,12"/></svg>
-          YouTube
-        </div>
-      </div>
-    </div>
-    <div class="preview-info">
-      <div class="preview-title" id="preview-title"></div>
-      <div class="preview-meta" id="preview-meta"></div>
-    </div>
-  </div>
-
-  <!-- DRILL FORM -->
-  <div class="drill-form" id="drill-form">
-
-    <div class="form-section">
-      <div class="form-section-title">Basic info</div>
-      <div class="field">
-        <label>Drill title</label>
-        <input type="text" id="f-title" placeholder="e.g. Traffic Lights">
-      </div>
-      <div class="field-row">
-        <div class="field">
-          <label>Development stage</label>
-          <select id="f-stage">
-            <option value="1">Stage 1 — Foundation (5–8)</option>
-            <option value="2">Stage 2 — Development (9–12)</option>
-            <option value="3">Stage 3 — Build to Compete (13–15)</option>
-            <option value="4">Stage 4 — Train to Compete (16–18)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Drill type</label>
-          <select id="f-type">
-            <option value="skill">Skill</option>
-            <option value="physical">Physical</option>
-            <option value="game">Game</option>
-            <option value="mental">Mental</option>
-          </select>
-        </div>
-      </div>
-      <div class="field-row-3">
-        <div class="field">
-          <label>Duration</label>
-          <input type="text" id="f-time" placeholder="e.g. 20 min">
-        </div>
-        <div class="field">
-          <label>Players</label>
-          <input type="text" id="f-players" placeholder="e.g. 8–16">
-        </div>
-        <div class="field">
-          <label>Equipment</label>
-          <input type="text" id="f-equipment" placeholder="e.g. Cones, balls">
-        </div>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="form-section-title">Description</div>
-      <div class="field">
-        <label>Summary <span style="font-weight:400;color:var(--ink-muted)">(shown on the drill card)</span></label>
-        <textarea id="f-summary" rows="2" placeholder="One or two sentences describing the drill..."></textarea>
-      </div>
-      <div class="field">
-        <label>Objective</label>
-        <textarea id="f-objective" rows="2" placeholder="What will athletes develop?"></textarea>
-      </div>
-      <div class="field">
-        <label>Setup</label>
-        <textarea id="f-setup" rows="2" placeholder="How to arrange the space and players..."></textarea>
-      </div>
-    </div>
-
-    <div class="form-section">
-      <div class="form-section-title">Instructions</div>
-      <div class="instructions-list" id="instructions-list"></div>
-      <button class="add-step-btn" onclick="addStep()">+ Add step</button>
-    </div>
-
-    <div class="form-section">
-      <div class="form-section-title">Coaching notes</div>
-      <div class="field">
-        <label>Coaching notes</label>
-        <textarea id="f-coaching" rows="3" placeholder="Key things to watch and say..."></textarea>
-      </div>
-      <div class="field">
-        <label>Variations</label>
-        <textarea id="f-variations" rows="2" placeholder="Ways to make it easier or harder..."></textarea>
-      </div>
-    </div>
-
-    <div class="form-actions">
-      <button class="btn btn-green" onclick="saveDrill()" id="save-btn">Save drill to site</button>
-      <span class="hint">Saves directly to GitHub — site updates in ~30 seconds</span>
-    </div>
-
-    <div class="status" id="status"></div>
-
+<div class="settings-overlay" id="settings-overlay" onclick="outsideSettings(event)">
+  <div class="settings-panel">
+    <h3>API Settings</h3>
+    <div class="sf"><label>YouTube API Key</label><input type="password" id="yt-key" placeholder="AIzaSy..."></div>
+    <div class="sf"><label>GitHub Token</label><input type="password" id="gh-token" placeholder="ghp_..."></div>
+    <div class="sf"><label>GitHub Repo</label><input type="text" id="gh-repo" placeholder="username/coachstage" style="font-family:'DM Sans',sans-serif;"></div>
+    <p class="settings-note">Saved in your browser only. Never sent anywhere except directly to YouTube and GitHub APIs.</p>
+    <button class="settings-save" onclick="saveSettings()">Save settings</button>
   </div>
 </div>
 
-<footer>CoachStage &nbsp;·&nbsp; Drill Importer &nbsp;·&nbsp; Admin only</footer>
+<div class="layout">
+<div class="form-col">
+
+  <div class="page-header">
+    <h1>Drill Builder</h1>
+    <p>Paste a YouTube URL to pre-fill details, or build from scratch.</p>
+  </div>
+
+  <div class="yt-box">
+    <label>YouTube URL <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
+    <div class="yt-row">
+      <input class="yt-input" type="text" id="yt-url" placeholder="https://www.youtube.com/watch?v=..." oninput="updatePreview()">
+      <button class="fetch-btn" id="fetch-btn" onclick="fetchVideo()">Fetch</button>
+    </div>
+    <div class="yt-fetched" id="yt-fetched">
+      <img class="yt-thumb" id="yt-thumb" src="" alt="">
+      <div class="yt-meta"><strong id="yt-fetched-title"></strong><span id="yt-fetched-meta"></span></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Basic info</div>
+    <div class="field">
+      <label>Drill title</label>
+      <input type="text" id="f-title" placeholder="e.g. Traffic Lights" oninput="updatePreview()">
+    </div>
+    <div class="field">
+      <label>Stage</label>
+      <div class="segment" id="stage-seg">
+        <button class="seg s1 on" onclick="setStage('1',this)">Foundation<br><span style="font-weight:400;font-size:10px">5–8</span></button>
+        <button class="seg s2" onclick="setStage('2',this)">Development<br><span style="font-weight:400;font-size:10px">9–12</span></button>
+        <button class="seg s3" onclick="setStage('3',this)">Build to Compete<br><span style="font-weight:400;font-size:10px">13–15</span></button>
+        <button class="seg s4" onclick="setStage('4',this)">Train to Compete<br><span style="font-weight:400;font-size:10px">16–18</span></button>
+      </div>
+      <input type="hidden" id="f-stage" value="1">
+    </div>
+    <div class="field">
+      <label>Type</label>
+      <div class="segment" id="type-seg">
+        <button class="seg on" onclick="setType('skill',this)">Skill</button>
+        <button class="seg" onclick="setType('physical',this)">Physical</button>
+        <button class="seg" onclick="setType('game',this)">Game</button>
+        <button class="seg" onclick="setType('mental',this)">Mental</button>
+      </div>
+      <input type="hidden" id="f-type" value="skill">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Session logistics</div>
+    <div class="field">
+      <label>Duration</label>
+      <div class="presets" id="dur-presets">
+        <button class="preset" onclick="pickPreset('f-time',this,'10 min','dur-presets')">10 min</button>
+        <button class="preset" onclick="pickPreset('f-time',this,'15 min','dur-presets')">15 min</button>
+        <button class="preset on" onclick="pickPreset('f-time',this,'20 min','dur-presets')">20 min</button>
+        <button class="preset" onclick="pickPreset('f-time',this,'25 min','dur-presets')">25 min</button>
+        <button class="preset" onclick="pickPreset('f-time',this,'30 min','dur-presets')">30 min</button>
+        <button class="preset" onclick="pickPreset('f-time',this,'40 min','dur-presets')">40 min</button>
+      </div>
+      <input type="text" id="f-time" value="20 min" placeholder="e.g. 20 min" oninput="clearPresets('dur-presets');updatePreview()">
+    </div>
+    <div class="field">
+      <label>Players</label>
+      <div class="presets" id="pl-presets">
+        <button class="preset" onclick="pickPreset('f-players',this,'Any','pl-presets')">Any</button>
+        <button class="preset" onclick="pickPreset('f-players',this,'Pairs','pl-presets')">Pairs</button>
+        <button class="preset" onclick="pickPreset('f-players',this,'4–10','pl-presets')">4–10</button>
+        <button class="preset on" onclick="pickPreset('f-players',this,'8–16','pl-presets')">8–16</button>
+        <button class="preset" onclick="pickPreset('f-players',this,'10–20','pl-presets')">10–20</button>
+        <button class="preset" onclick="pickPreset('f-players',this,'12+','pl-presets')">12+</button>
+      </div>
+      <input type="text" id="f-players" value="8–16" placeholder="e.g. 8–16" oninput="clearPresets('pl-presets');updatePreview()">
+    </div>
+    <div class="field">
+      <label>Equipment</label>
+      <div class="eq-tags" id="eq-tags">
+        <button class="eq-tag" onclick="toggleEq('None',this)">None</button>
+        <button class="eq-tag" onclick="toggleEq('Cones',this)">Cones</button>
+        <button class="eq-tag" onclick="toggleEq('Balls',this)">Balls</button>
+        <button class="eq-tag" onclick="toggleEq('Bibs',this)">Bibs</button>
+        <button class="eq-tag" onclick="toggleEq('Goals',this)">Goals</button>
+        <button class="eq-tag" onclick="toggleEq('Agility ladder',this)">Agility ladder</button>
+        <button class="eq-tag" onclick="toggleEq('Resistance bands',this)">Resistance bands</button>
+        <button class="eq-tag" onclick="toggleEq('Stopwatch',this)">Stopwatch</button>
+        <button class="eq-tag" onclick="toggleEq('Mat',this)">Mat</button>
+        <button class="eq-tag" onclick="toggleEq('Whiteboard',this)">Whiteboard</button>
+      </div>
+      <div class="eq-custom-row">
+        <input type="text" id="eq-custom" placeholder="Add custom equipment...">
+        <button class="eq-add" onclick="addCustomEq()">Add</button>
+      </div>
+      <input type="hidden" id="f-equipment">
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Description</div>
+    <div class="field">
+      <label>Summary <span style="font-size:12px;font-weight:400;color:var(--ink-muted)">shown on the drill card</span> <span class="cc" id="summary-cc">0 / 120</span></label>
+      <textarea id="f-summary" rows="2" placeholder="One or two sentences that describe what this drill is and why it's valuable..." oninput="updatePreview();countChars('f-summary','summary-cc',120)"></textarea>
+    </div>
+    <div class="field">
+      <label>Objective</label>
+      <textarea id="f-objective" rows="2" placeholder="What physical or mental quality will athletes develop?"></textarea>
+    </div>
+    <div class="field">
+      <label>Setup</label>
+      <textarea id="f-setup" rows="2" placeholder="How to arrange the space, cones, players before starting..."></textarea>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Step-by-step instructions</div>
+    <div class="steps-list" id="steps-list"></div>
+    <button class="add-step" onclick="addStep()">+ Add step</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Coaching notes</div>
+    <div class="field">
+      <label>Coaching notes</label>
+      <textarea id="f-coaching" rows="3" placeholder="What to watch for, what to say, common mistakes to correct..."></textarea>
+    </div>
+    <div class="field">
+      <label>Variations</label>
+      <textarea id="f-variations" rows="2" placeholder="Ways to make it harder, easier, or different..."></textarea>
+    </div>
+  </div>
+
+  <div class="inline-status" id="inline-status"></div>
+  <div style="height:80px"></div>
+</div>
+
+<!-- PREVIEW COLUMN -->
+<div class="preview-col">
+  <div class="preview-label">Live card preview</div>
+  <div class="prev-card">
+    <div class="prev-thumb" id="prev-thumb">
+      <img id="prev-thumb-img" src="" alt="">
+      <div class="play"><div class="play-dot"><svg width="12" height="12" viewBox="0 0 12 12" fill="white"><polygon points="3,1 11,6 3,11"/></svg></div></div>
+    </div>
+    <div class="prev-body">
+      <div class="prev-badges">
+        <span class="prev-sb" id="prev-sb">Stage 1</span>
+        <span class="prev-tb" id="prev-tb">Skill</span>
+      </div>
+      <div class="prev-title" id="prev-title">Drill title</div>
+      <div class="prev-summary" id="prev-summary">Your summary will appear here...</div>
+      <div class="prev-footer">
+        <span class="prev-stat" id="prev-time">⏱ 20 min</span>
+        <span class="prev-stat" id="prev-players">👥 8–16</span>
+        <span class="prev-stat" id="prev-eq">🎯 —</span>
+      </div>
+    </div>
+  </div>
+  <p class="prev-hint">Keep the summary under 120 characters so it fits neatly on the card. The preview updates as you type.</p>
+</div>
+</div>
+
+<div class="save-bar">
+  <button class="save-btn" id="save-btn" onclick="saveDrill()">Save drill to site</button>
+  <button class="clear-btn" onclick="resetForm()">Clear</button>
+  <span class="save-msg" id="save-msg">Site updates ~30 seconds after saving</span>
+</div>
 
 <script>
-// ===================== KEYS =====================
-function saveKeys() {
-  const ytKey = document.getElementById('yt-key').value;
-  const ghToken = document.getElementById('gh-token').value;
-  const ghRepo = document.getElementById('gh-repo').value;
-  if (ytKey) { localStorage.setItem('cs_yt_key', ytKey); document.getElementById('yt-key').classList.add('saved'); }
-  if (ghToken) { localStorage.setItem('cs_gh_token', ghToken); document.getElementById('gh-token').classList.add('saved'); }
-  if (ghRepo) localStorage.setItem('cs_gh_repo', ghRepo);
-}
-
-function loadKeys() {
-  const ytKey = localStorage.getItem('cs_yt_key');
-  const ghToken = localStorage.getItem('cs_gh_token');
-  const ghRepo = localStorage.getItem('cs_gh_repo');
-  if (ytKey) { document.getElementById('yt-key').value = ytKey; document.getElementById('yt-key').classList.add('saved'); }
-  if (ghToken) { document.getElementById('gh-token').value = ghToken; document.getElementById('gh-token').classList.add('saved'); }
-  if (ghRepo) document.getElementById('gh-repo').value = ghRepo;
-}
-
-// ===================== YOUTUBE FETCH =====================
-function getYouTubeId(url) {
-  if (!url || typeof url !== 'string') return '';
-  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  return match ? match[1] : '';
-}
-
-async function fetchVideo() {
-  const url = document.getElementById('yt-url').value.trim();
-  const apiKey = localStorage.getItem('cs_yt_key');
-  const videoId = getYouTubeId(url);
-
-  if (!apiKey) { showStatus('Please enter your YouTube API key in the setup section above.', 'error'); return; }
-  if (!videoId) { showStatus('Please enter a valid YouTube URL.', 'error'); return; }
-
-  const btn = document.getElementById('fetch-btn');
-  btn.textContent = 'Fetching...'; btn.disabled = true;
-
-  try {
-    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet,contentDetails`);
-    const data = await res.json();
-
-    if (!data.items || data.items.length === 0) {
-      showStatus('Video not found. Check the URL and try again.', 'error');
-      btn.textContent = 'Fetch Video'; btn.disabled = false;
-      return;
-    }
-
-    const video = data.items[0];
-    const snippet = video.snippet;
-    const duration = parseDuration(video.contentDetails.duration);
-    const thumb = snippet.thumbnails.medium?.url || snippet.thumbnails.default?.url;
-
-    // Show preview
-    document.getElementById('preview-img').src = thumb;
-    document.getElementById('preview-title').textContent = snippet.title;
-    document.getElementById('preview-meta').textContent = `${snippet.channelTitle} · ${duration}`;
-    document.getElementById('video-preview').classList.add('visible');
-
-    // Pre-fill form
-    document.getElementById('f-title').value = snippet.title;
-    document.getElementById('f-time').value = duration;
-
-    // Parse description into fields
-    const desc = snippet.description;
-    const lines = desc.split('\n').filter(l => l.trim());
-    if (lines.length > 0) document.getElementById('f-summary').value = lines.slice(0, 2).join(' ');
-    if (lines.length > 2) document.getElementById('f-objective').value = lines.slice(2, 4).join(' ');
-
-    // Build instructions from description lines
-    clearSteps();
-    const instrLines = lines.slice(0, Math.min(6, lines.length));
-    instrLines.forEach(line => addStep(line));
-
-    // Show form
-    document.getElementById('drill-form').classList.add('visible');
-    document.getElementById('drill-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    showStatus('Video fetched! Review and edit the details below, then save.', 'success');
-
-  } catch(e) {
-    showStatus('Error fetching video: ' + e.message, 'error');
-  }
-
-  btn.textContent = 'Fetch Video'; btn.disabled = false;
-}
-
-function parseDuration(iso) {
-  const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
-  if (!match) return '';
-  const h = parseInt(match[1] || 0);
-  const m = parseInt(match[2] || 0);
-  if (h > 0) return `${h}h ${m}min`;
-  return `${m} min`;
-}
-
-// ===================== INSTRUCTIONS =====================
+let selectedEq = new Set();
 let stepCount = 0;
+let currentStage = '1';
+let currentType = 'skill';
 
-function addStep(value = '') {
+const stageColors = {
+  '1':{ color:'var(--stage-1)', bg:'var(--stage-1-bg)', border:'var(--stage-1-border)', label:'Stage 1' },
+  '2':{ color:'var(--stage-2)', bg:'var(--stage-2-bg)', border:'var(--stage-2-border)', label:'Stage 2' },
+  '3':{ color:'var(--stage-3)', bg:'var(--stage-3-bg)', border:'var(--stage-3-border)', label:'Stage 3' },
+  '4':{ color:'var(--stage-4)', bg:'var(--stage-4-bg)', border:'var(--stage-4-border)', label:'Stage 4' },
+};
+const typeLabels = { skill:'Skill', physical:'Physical', game:'Game', mental:'Mental' };
+
+// Settings
+function toggleSettings() { document.getElementById('settings-overlay').classList.toggle('open'); }
+function outsideSettings(e) { if(e.target===document.getElementById('settings-overlay')) toggleSettings(); }
+function saveSettings() {
+  const ytKey = document.getElementById('yt-key').value.trim();
+  const ghToken = document.getElementById('gh-token').value.trim();
+  const ghRepo = document.getElementById('gh-repo').value.trim();
+  if(ytKey){localStorage.setItem('cs_yt_key',ytKey);document.getElementById('yt-key').classList.add('ok');}
+  if(ghToken){localStorage.setItem('cs_gh_token',ghToken);document.getElementById('gh-token').classList.add('ok');}
+  if(ghRepo) localStorage.setItem('cs_gh_repo',ghRepo);
+  toggleSettings();
+  setSaveMsg('Settings saved!','ok');
+}
+function loadSettings() {
+  const ytKey=localStorage.getItem('cs_yt_key');
+  const ghToken=localStorage.getItem('cs_gh_token');
+  const ghRepo=localStorage.getItem('cs_gh_repo');
+  if(ytKey){document.getElementById('yt-key').value=ytKey;document.getElementById('yt-key').classList.add('ok');}
+  if(ghToken){document.getElementById('gh-token').value=ghToken;document.getElementById('gh-token').classList.add('ok');}
+  if(ghRepo) document.getElementById('gh-repo').value=ghRepo;
+}
+
+// Segments
+function setStage(val, btn) {
+  currentStage=val; document.getElementById('f-stage').value=val;
+  document.querySelectorAll('#stage-seg .seg').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); updatePreview();
+}
+function setType(val, btn) {
+  currentType=val; document.getElementById('f-type').value=val;
+  document.querySelectorAll('#type-seg .seg').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on'); updatePreview();
+}
+
+// Presets
+function pickPreset(fieldId, btn, val, groupId) {
+  document.getElementById(fieldId).value=val;
+  clearPresets(groupId); btn.classList.add('on'); updatePreview();
+}
+function clearPresets(groupId) { document.querySelectorAll(`#${groupId} .preset`).forEach(b=>b.classList.remove('on')); }
+
+// Equipment
+function toggleEq(val, btn) {
+  if(val==='None') {
+    selectedEq.clear(); document.querySelectorAll('.eq-tag').forEach(t=>t.classList.remove('on'));
+    selectedEq.add('None'); btn.classList.add('on');
+  } else {
+    selectedEq.delete('None'); document.querySelector('.eq-tag').classList.remove('on');
+    if(selectedEq.has(val)){selectedEq.delete(val);btn.classList.remove('on');}
+    else{selectedEq.add(val);btn.classList.add('on');}
+  }
+  document.getElementById('f-equipment').value=Array.from(selectedEq).join(', ');
+  updatePreview();
+}
+function addCustomEq() {
+  const input=document.getElementById('eq-custom');
+  const val=input.value.trim(); if(!val) return;
+  selectedEq.delete('None'); document.querySelector('.eq-tag').classList.remove('on');
+  selectedEq.add(val);
+  const btn=document.createElement('button');
+  btn.className='eq-tag on'; btn.textContent=val;
+  btn.onclick=()=>toggleEq(val,btn);
+  document.getElementById('eq-tags').appendChild(btn);
+  input.value='';
+  document.getElementById('f-equipment').value=Array.from(selectedEq).join(', ');
+  updatePreview();
+}
+
+// Steps
+function addStep(value='') {
   stepCount++;
-  const list = document.getElementById('instructions-list');
-  const row = document.createElement('div');
-  row.className = 'instruction-row';
-  row.id = `step-${stepCount}`;
-  row.innerHTML = `
-    <div class="instruction-num">${list.children.length + 1}</div>
-    <input type="text" value="${value.replace(/"/g, '&quot;')}" placeholder="Step ${list.children.length + 1}...">
-    <button class="remove-btn" onclick="removeStep('step-${stepCount}')">×</button>`;
-  list.appendChild(row);
-  renumberSteps();
+  const list=document.getElementById('steps-list');
+  const row=document.createElement('div'); row.className='step-row'; row.id=`step-${stepCount}`;
+  row.innerHTML=`<div class="step-n">${list.children.length+1}</div><input class="step-input" type="text" value="${value.replace(/"/g,'&quot;')}" placeholder="Step..."><button class="step-del" onclick="removeStep('step-${stepCount}')">×</button>`;
+  list.appendChild(row); renumberSteps();
+}
+function removeStep(id) { document.getElementById(id)?.remove(); renumberSteps(); }
+function renumberSteps() { document.querySelectorAll('.step-row').forEach((r,i)=>r.querySelector('.step-n').textContent=i+1); }
+function getSteps() { return Array.from(document.querySelectorAll('.step-input')).map(i=>i.value.trim()).filter(Boolean); }
+
+// Char count
+function countChars(fieldId, countId, max) {
+  const len=document.getElementById(fieldId).value.length;
+  const el=document.getElementById(countId);
+  el.textContent=`${len} / ${max}`; el.classList.toggle('warn',len>max);
 }
 
-function removeStep(id) {
-  document.getElementById(id)?.remove();
-  renumberSteps();
+// YouTube
+function getYouTubeId(url) {
+  if(!url||typeof url!=='string') return '';
+  const m=url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return m?m[1]:'';
+}
+function parseDuration(iso) {
+  const m=iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/); if(!m) return '';
+  const h=parseInt(m[1]||0),min=parseInt(m[2]||0);
+  return h>0?`${h}h ${min}min`:`${min} min`;
+}
+async function fetchVideo() {
+  const url=document.getElementById('yt-url').value.trim();
+  const apiKey=localStorage.getItem('cs_yt_key');
+  const videoId=getYouTubeId(url);
+  if(!apiKey){showInlineStatus('Add your YouTube API key in settings (⚙ top right).','err');return;}
+  if(!videoId){showInlineStatus('Enter a valid YouTube URL.','err');return;}
+  const btn=document.getElementById('fetch-btn');
+  btn.textContent='...'; btn.disabled=true;
+  try {
+    const res=await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet,contentDetails`);
+    const data=await res.json();
+    if(!data.items?.length){showInlineStatus('Video not found.','err');btn.textContent='Fetch';btn.disabled=false;return;}
+    const v=data.items[0]; const s=v.snippet;
+    const dur=parseDuration(v.contentDetails.duration);
+    document.getElementById('yt-thumb').src=s.thumbnails.medium?.url||s.thumbnails.default?.url;
+    document.getElementById('yt-fetched-title').textContent=s.title;
+    document.getElementById('yt-fetched-meta').textContent=s.channelTitle+' · '+dur;
+    document.getElementById('yt-fetched').classList.add('show');
+    document.getElementById('f-title').value=s.title;
+    document.getElementById('f-time').value=dur; clearPresets('dur-presets');
+    const lines=s.description.split('\n').filter(l=>l.trim());
+    if(lines.length>0){document.getElementById('f-summary').value=lines[0].substring(0,120);countChars('f-summary','summary-cc',120);}
+    if(lines.length>1) document.getElementById('f-objective').value=lines[1];
+    document.getElementById('steps-list').innerHTML=''; stepCount=0;
+    lines.slice(2,7).forEach(l=>addStep(l));
+    if(getSteps().length===0){addStep();addStep();addStep();}
+    updatePreview();
+    showInlineStatus('Video fetched! Review and edit the details below, then save.','ok');
+  } catch(e){showInlineStatus('Error: '+e.message,'err');}
+  btn.textContent='Fetch'; btn.disabled=false;
 }
 
-function clearSteps() {
-  document.getElementById('instructions-list').innerHTML = '';
-  stepCount = 0;
+// Live preview
+function updatePreview() {
+  const title=document.getElementById('f-title').value||'Drill title';
+  const summary=document.getElementById('f-summary').value||'';
+  const time=document.getElementById('f-time').value||'—';
+  const players=document.getElementById('f-players').value||'—';
+  const eq=document.getElementById('f-equipment').value||'—';
+  const ytId=getYouTubeId(document.getElementById('yt-url').value);
+  const sc=stageColors[currentStage];
+  const thumb=document.getElementById('prev-thumb');
+  if(ytId){document.getElementById('prev-thumb-img').src=`https://img.youtube.com/vi/${ytId}/mqdefault.jpg`;thumb.style.display='block';}
+  else{thumb.style.display='none';}
+  const sb=document.getElementById('prev-sb');
+  sb.textContent=sc.label; sb.style.color=sc.color; sb.style.background=sc.bg; sb.style.borderColor=sc.border;
+  document.getElementById('prev-tb').textContent=typeLabels[currentType]||currentType;
+  document.getElementById('prev-title').textContent=title;
+  const ps=document.getElementById('prev-summary');
+  ps.textContent=summary||'Your summary will appear here...';
+  ps.className='prev-summary'+(summary?' has-text':'');
+  document.getElementById('prev-time').textContent='⏱ '+time;
+  document.getElementById('prev-players').textContent='👥 '+players;
+  document.getElementById('prev-eq').textContent='🎯 '+(eq||'—');
 }
 
-function renumberSteps() {
-  document.querySelectorAll('.instruction-row').forEach((row, i) => {
-    row.querySelector('.instruction-num').textContent = i + 1;
-  });
-}
-
-// ===================== SAVE TO GITHUB =====================
+// Save
 async function saveDrill() {
-  const ghToken = localStorage.getItem('cs_gh_token');
-  const ghRepo = localStorage.getItem('cs_gh_repo');
-  const ytUrl = document.getElementById('yt-url').value.trim();
-
-  if (!ghToken || !ghRepo) { showStatus('Please enter your GitHub token and repo in the setup section.', 'error'); return; }
-
-  const title = document.getElementById('f-title').value.trim();
-  if (!title) { showStatus('Please enter a drill title.', 'error'); return; }
-
-  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  const filename = `drills/${slug}.md`;
-
-  const steps = Array.from(document.querySelectorAll('.instruction-row input'))
-    .map(i => i.value.trim()).filter(Boolean)
-    .map(s => `  - "${s.replace(/"/g, "'")}"`).join('\n');
-
-  const content = `---
+  const ghToken=localStorage.getItem('cs_gh_token');
+  const ghRepo=localStorage.getItem('cs_gh_repo');
+  const ytUrl=document.getElementById('yt-url').value.trim();
+  const title=document.getElementById('f-title').value.trim();
+  if(!ghToken||!ghRepo){showInlineStatus('Add your GitHub token and repo in settings (⚙ top right).','err');return;}
+  if(!title){showInlineStatus('Please enter a drill title.','err');return;}
+  const slug=title.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const steps=getSteps().map(s=>`  - "${s.replace(/"/g,"'")}"`).join('\n');
+  const safe=s=>(s||'').replace(/"/g,"'");
+  const content=`---
 youtube: "${ytUrl}"
 title: ${title}
 stage: "${document.getElementById('f-stage').value}"
 type: ${document.getElementById('f-type').value}
 time: ${document.getElementById('f-time').value}
 players: ${document.getElementById('f-players').value}
-equipment: ${document.getElementById('f-equipment').value}
-summary: "${document.getElementById('f-summary').value.replace(/"/g, "'")}"
-objective: "${document.getElementById('f-objective').value.replace(/"/g, "'")}"
-setup: "${document.getElementById('f-setup').value.replace(/"/g, "'")}"
+equipment: ${document.getElementById('f-equipment').value||'None'}
+summary: "${safe(document.getElementById('f-summary').value)}"
+objective: "${safe(document.getElementById('f-objective').value)}"
+setup: "${safe(document.getElementById('f-setup').value)}"
 instructions:
 ${steps}
-coaching: "${document.getElementById('f-coaching').value.replace(/"/g, "'")}"
-variations: "${document.getElementById('f-variations').value.replace(/"/g, "'")}"
+coaching: "${safe(document.getElementById('f-coaching').value)}"
+variations: "${safe(document.getElementById('f-variations').value)}"
 ---`;
-
-  const btn = document.getElementById('save-btn');
-  btn.textContent = 'Saving...'; btn.disabled = true;
-  showStatus('Saving drill to GitHub...', 'loading');
-
+  const btn=document.getElementById('save-btn');
+  btn.textContent='Saving...'; btn.disabled=true;
+  setSaveMsg('Saving to GitHub...','');
   try {
-    // Check if file already exists to get its SHA
-    let sha = null;
-    const checkRes = await fetch(`https://api.github.com/repos/${ghRepo}/contents/${filename}`, {
-      headers: { 'Authorization': `token ${ghToken}`, 'Accept': 'application/vnd.github.v3+json' }
-    });
-    if (checkRes.ok) {
-      const existing = await checkRes.json();
-      sha = existing.sha;
-    }
-
-    // Save file
-    const body = {
-      message: `Add drill: ${title}`,
-      content: btoa(unescape(encodeURIComponent(content))),
-      branch: 'main'
-    };
-    if (sha) body.sha = sha;
-
-    const saveRes = await fetch(`https://api.github.com/repos/${ghRepo}/contents/${filename}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `token ${ghToken}`,
-        'Accept': 'application/vnd.github.v3+json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(body)
-    });
-
-    if (!saveRes.ok) {
-      const err = await saveRes.json();
-      throw new Error(err.message || 'GitHub API error');
-    }
-
-    showStatus(`✓ Drill "${title}" saved successfully! Your site will update in about 30 seconds.`, 'success');
-    btn.textContent = 'Save drill to site';
-    btn.disabled = false;
-
-  } catch(e) {
-    showStatus('Error saving: ' + e.message, 'error');
-    btn.textContent = 'Save drill to site';
-    btn.disabled = false;
+    const filename=`drills/${slug}.md`;
+    let sha=null;
+    const check=await fetch(`https://api.github.com/repos/${ghRepo}/contents/${filename}`,{headers:{'Authorization':`token ${ghToken}`,'Accept':'application/vnd.github.v3+json'}});
+    if(check.ok) sha=(await check.json()).sha;
+    const body={message:`Add drill: ${title}`,content:btoa(unescape(encodeURIComponent(content))),branch:'main'};
+    if(sha) body.sha=sha;
+    const res=await fetch(`https://api.github.com/repos/${ghRepo}/contents/${filename}`,{method:'PUT',headers:{'Authorization':`token ${ghToken}`,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},body:JSON.stringify(body)});
+    if(!res.ok){const err=await res.json();throw new Error(err.message||'GitHub API error');}
+    setSaveMsg(`✓ "${title}" saved — site updates in ~30 seconds`,'ok');
+    showInlineStatus(`Drill "${title}" saved successfully!`,'ok');
+  } catch(e){
+    setSaveMsg('Error: '+e.message,'err');
+    showInlineStatus('Save failed: '+e.message,'err');
   }
+  btn.textContent='Save drill to site'; btn.disabled=false;
 }
 
-// ===================== STATUS =====================
-function showStatus(msg, type) {
-  const el = document.getElementById('status');
-  el.textContent = msg;
-  el.className = `status visible status-${type}`;
+function setSaveMsg(msg,type){const el=document.getElementById('save-msg');el.textContent=msg;el.className='save-msg'+(type?' '+type:'');}
+function showInlineStatus(msg,type){const el=document.getElementById('inline-status');el.textContent=msg;el.className=`inline-status show ${type}`;setTimeout(()=>el.classList.remove('show'),6000);}
+
+function resetForm() {
+  if(!confirm('Clear the form and start fresh?')) return;
+  ['f-title','f-summary','f-objective','f-setup','f-coaching','f-variations','yt-url'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('yt-fetched').classList.remove('show');
+  document.getElementById('steps-list').innerHTML=''; stepCount=0;
+  selectedEq.clear(); document.querySelectorAll('.eq-tag').forEach(t=>t.classList.remove('on'));
+  document.getElementById('f-equipment').value='';
+  document.getElementById('f-time').value='20 min'; clearPresets('dur-presets'); document.querySelector('#dur-presets .preset:nth-child(3)').classList.add('on');
+  document.getElementById('f-players').value='8–16'; clearPresets('pl-presets'); document.querySelector('#pl-presets .preset:nth-child(4)').classList.add('on');
+  addStep(); addStep(); addStep();
+  updatePreview(); setSaveMsg('Site updates ~30 seconds after saving','');
 }
 
-// ===================== INIT =====================
-loadKeys();
-addStep('');
-addStep('');
-addStep('');
+// Init
+loadSettings();
+addStep(); addStep(); addStep();
+updatePreview();
 </script>
 </body>
 </html>
