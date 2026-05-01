@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Drill Importer — CoachStage</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #F5F0E8;
+    --ink: #1A1A18;
+    --ink-soft: #3D3D38;
+    --ink-muted: #7A7A72;
+    --green: #4A9B6F;
+    --green-bg: #E6F4ED;
+    --green-border: #8DCCA8;
+    --red: #C03030;
+    --red-bg: #FDEAEA;
+    --red-border: #F0A0A0;
+    --amber: #9A6A00;
+    --amber-bg: #FEF3D0;
+    --amber-border: #F0C878;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(245,240,232,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(26,26,24,0.1);
+    padding: 0 24px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 60px;
+  }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px; color: var(--ink);
+    text-decoration: none;
+  }
+  .nav-logo span { color: var(--green); }
+  .nav-back {
+    font-size: 13px; font-weight: 500; color: var(--ink-muted);
+    text-decoration: none; padding: 6px 14px; border-radius: 99px;
+    border: 1px solid rgba(26,26,24,0.15); background: white;
+    transition: all .15s;
+  }
+  .nav-back:hover { color: var(--ink); border-color: rgba(26,26,24,0.3); }
+
+  .container { max-width: 760px; margin: 0 auto; padding: 48px 24px 80px; }
+
+  .page-header { margin-bottom: 36px; }
+  .page-eyebrow {
+    font-size: 11px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--green); margin-bottom: 10px;
+    display: inline-block; padding: 3px 10px; border-radius: 99px;
+    background: var(--green-bg); border: 1px solid var(--green-border);
+  }
+  .page-header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px; line-height: 1.15; margin-bottom: 10px;
+  }
+  .page-header p { color: var(--ink-muted); font-size: 15px; max-width: 480px; }
+
+  /* SETUP SECTION */
+  .setup-card {
+    background: var(--amber-bg); border: 1px solid var(--amber-border);
+    border-radius: var(--radius); padding: 20px 24px; margin-bottom: 28px;
+  }
+  .setup-card h3 { font-size: 14px; font-weight: 600; color: var(--amber); margin-bottom: 12px; }
+  .setup-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width:520px) { .setup-grid { grid-template-columns: 1fr; } }
+  .setup-field label {
+    display: block; font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .08em; color: var(--amber); margin-bottom: 5px;
+  }
+  .setup-field input {
+    width: 100%; padding: 8px 12px; border-radius: var(--radius-sm);
+    border: 1px solid var(--amber-border); background: white;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink);
+    font-family: monospace;
+  }
+  .setup-field input:focus { outline: none; border-color: var(--amber); }
+  .setup-field input.saved { border-color: var(--green-border); background: var(--green-bg); }
+  .setup-note { font-size: 12px; color: var(--amber); margin-top: 10px; }
+
+  /* URL INPUT */
+  .url-section { margin-bottom: 28px; }
+  .url-section label {
+    display: block; font-size: 13px; font-weight: 600; margin-bottom: 8px;
+  }
+  .url-row { display: flex; gap: 10px; }
+  .url-input {
+    flex: 1; padding: 12px 16px; border-radius: var(--radius-sm);
+    border: 1px solid rgba(26,26,24,0.2); background: white;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
+  }
+  .url-input:focus { outline: none; border-color: var(--green); }
+  .btn {
+    padding: 12px 22px; border-radius: var(--radius-sm);
+    font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600;
+    border: none; cursor: pointer; transition: all .15s; white-space: nowrap;
+  }
+  .btn-primary { background: var(--ink); color: var(--cream); }
+  .btn-primary:hover { background: #333; }
+  .btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+  .btn-green { background: var(--green); color: white; }
+  .btn-green:hover { background: #3a7d59; }
+  .btn-green:disabled { background: #ccc; cursor: not-allowed; }
+
+  /* VIDEO PREVIEW */
+  .video-preview {
+    background: white; border-radius: var(--radius);
+    border: 1px solid rgba(26,26,24,0.1);
+    overflow: hidden; margin-bottom: 24px;
+    display: none;
+  }
+  .video-preview.visible { display: block; }
+  .preview-thumb {
+    position: relative; padding-bottom: 40%; background: #1a1a18; overflow: hidden;
+  }
+  .preview-thumb img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; opacity: 0.8; }
+  .preview-thumb-overlay {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  }
+  .yt-badge {
+    background: rgba(255,0,0,0.9); padding: 8px 16px; border-radius: 6px;
+    color: white; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px;
+  }
+  .preview-info { padding: 16px 20px; }
+  .preview-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .preview-meta { font-size: 13px; color: var(--ink-muted); }
+
+  /* FORM */
+  .drill-form { display: none; }
+  .drill-form.visible { display: block; }
+  .form-section { margin-bottom: 24px; }
+  .form-section-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .1em;
+    color: var(--ink-muted); margin-bottom: 14px; padding-bottom: 8px;
+    border-bottom: 1px solid rgba(26,26,24,0.1);
+  }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block; font-size: 13px; font-weight: 500; margin-bottom: 5px; color: var(--ink-soft);
+  }
+  .field input, .field select, .field textarea {
+    width: 100%; padding: 10px 14px; border-radius: var(--radius-sm);
+    border: 1px solid rgba(26,26,24,0.18); background: white;
+    font-family: 'DM Sans', sans-serif; font-size: 14px; color: var(--ink);
+    transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none; border-color: var(--green);
+  }
+  .field textarea { resize: vertical; min-height: 80px; }
+  .field-hint { font-size: 12px; color: var(--ink-muted); margin-top: 4px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  @media(max-width:520px) { .field-row, .field-row-3 { grid-template-columns: 1fr; } }
+
+  /* INSTRUCTIONS */
+  .instructions-list { display: flex; flex-direction: column; gap: 8px; }
+  .instruction-row { display: flex; gap: 8px; align-items: flex-start; }
+  .instruction-num {
+    width: 24px; height: 24px; border-radius: 50%; background: var(--green-bg);
+    border: 1px solid var(--green-border); color: var(--green);
+    font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; margin-top: 10px;
+  }
+  .instruction-row input { flex: 1; }
+  .remove-btn {
+    width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(26,26,24,0.15);
+    background: white; cursor: pointer; font-size: 14px; color: var(--ink-muted);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 8px;
+    transition: all .15s;
+  }
+  .remove-btn:hover { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+  .add-step-btn {
+    margin-top: 8px; padding: 8px 14px; border-radius: var(--radius-sm);
+    border: 1px dashed rgba(26,26,24,0.2); background: transparent;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--ink-muted);
+    cursor: pointer; transition: all .15s; width: 100%;
+  }
+  .add-step-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-bg); }
+
+  /* STATUS */
+  .status { border-radius: var(--radius-sm); padding: 12px 16px; font-size: 13px; margin-top: 16px; border: 1px solid; display: none; }
+  .status.visible { display: block; }
+  .status-success { background: var(--green-bg); border-color: var(--green-border); color: #1F5C3A; }
+  .status-error { background: var(--red-bg); border-color: var(--red-border); color: var(--red); }
+  .status-loading { background: var(--amber-bg); border-color: var(--amber-border); color: var(--amber); }
+
+  .form-actions { display: flex; gap: 12px; align-items: center; padding-top: 8px; }
+  .form-actions .hint { font-size: 13px; color: var(--ink-muted); }
+
+  footer {
+    border-top: 1px solid rgba(26,26,24,0.1);
+    padding: 24px; text-align: center;
+    font-size: 13px; color: var(--ink-muted);
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">Coach<span>Stage</span></a>
+  <a href="/" class="nav-back">← Back to site</a>
+</nav>
+
+<div class="container">
+
+  <div class="page-header">
+    <div class="page-eyebrow">Admin tool</div>
+    <h1>YouTube Drill Importer</h1>
+    <p>Paste a YouTube URL and we'll pull the video details to pre-fill your drill. Review and edit before saving.</p>
+  </div>
+
+  <!-- SETUP -->
+  <div class="setup-card">
+    <h3>⚙ One-time setup — your credentials are saved in this browser only</h3>
+    <div class="setup-grid">
+      <div class="setup-field">
+        <label>YouTube API Key</label>
+        <input type="password" id="yt-key" placeholder="AIzaSy..." oninput="saveKeys()">
+      </div>
+      <div class="setup-field">
+        <label>GitHub Token</label>
+        <input type="password" id="gh-token" placeholder="ghp_..." oninput="saveKeys()">
+      </div>
+    </div>
+    <div class="setup-field" style="margin-top:12px;">
+      <label>GitHub Repo (username/reponame)</label>
+      <input type="text" id="gh-repo" placeholder="skintownryan/coachstage" oninput="saveKeys()" style="font-family:'DM Sans',sans-serif;">
+    </div>
+    <p class="setup-note">These are stored only in your browser's localStorage and never sent anywhere except directly to YouTube and GitHub APIs.</p>
+  </div>
+
+  <!-- URL INPUT -->
+  <div class="url-section">
+    <label>YouTube URL</label>
+    <div class="url-row">
+      <input type="text" class="url-input" id="yt-url" placeholder="https://www.youtube.com/watch?v=..." />
+      <button class="btn btn-primary" onclick="fetchVideo()" id="fetch-btn">Fetch Video</button>
+    </div>
+  </div>
+
+  <!-- VIDEO PREVIEW -->
+  <div class="video-preview" id="video-preview">
+    <div class="preview-thumb">
+      <img id="preview-img" src="" alt="">
+      <div class="preview-thumb-overlay">
+        <div class="yt-badge">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="white"><polygon points="4,2 12,7 4,12"/></svg>
+          YouTube
+        </div>
+      </div>
+    </div>
+    <div class="preview-info">
+      <div class="preview-title" id="preview-title"></div>
+      <div class="preview-meta" id="preview-meta"></div>
+    </div>
+  </div>
+
+  <!-- DRILL FORM -->
+  <div class="drill-form" id="drill-form">
+
+    <div class="form-section">
+      <div class="form-section-title">Basic info</div>
+      <div class="field">
+        <label>Drill title</label>
+        <input type="text" id="f-title" placeholder="e.g. Traffic Lights">
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label>Development stage</label>
+          <select id="f-stage">
+            <option value="1">Stage 1 — Foundation (5–8)</option>
+            <option value="2">Stage 2 — Development (9–12)</option>
+            <option value="3">Stage 3 — Build to Compete (13–15)</option>
+            <option value="4">Stage 4 — Train to Compete (16–18)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Drill type</label>
+          <select id="f-type">
+            <option value="skill">Skill</option>
+            <option value="physical">Physical</option>
+            <option value="game">Game</option>
+            <option value="mental">Mental</option>
+          </select>
+        </div>
+      </div>
+      <div class="field-row-3">
+        <div class="field">
+          <label>Duration</label>
+          <input type="text" id="f-time" placeholder="e.g. 20 min">
+        </div>
+        <div class="field">
+          <label>Players</label>
+          <input type="text" id="f-players" placeholder="e.g. 8–16">
+        </div>
+        <div class="field">
+          <label>Equipment</label>
+          <input type="text" id="f-equipment" placeholder="e.g. Cones, balls">
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Description</div>
+      <div class="field">
+        <label>Summary <span style="font-weight:400;color:var(--ink-muted)">(shown on the drill card)</span></label>
+        <textarea id="f-summary" rows="2" placeholder="One or two sentences describing the drill..."></textarea>
+      </div>
+      <div class="field">
+        <label>Objective</label>
+        <textarea id="f-objective" rows="2" placeholder="What will athletes develop?"></textarea>
+      </div>
+      <div class="field">
+        <label>Setup</label>
+        <textarea id="f-setup" rows="2" placeholder="How to arrange the space and players..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Instructions</div>
+      <div class="instructions-list" id="instructions-list"></div>
+      <button class="add-step-btn" onclick="addStep()">+ Add step</button>
+    </div>
+
+    <div class="form-section">
+      <div class="form-section-title">Coaching notes</div>
+      <div class="field">
+        <label>Coaching notes</label>
+        <textarea id="f-coaching" rows="3" placeholder="Key things to watch and say..."></textarea>
+      </div>
+      <div class="field">
+        <label>Variations</label>
+        <textarea id="f-variations" rows="2" placeholder="Ways to make it easier or harder..."></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-green" onclick="saveDrill()" id="save-btn">Save drill to site</button>
+      <span class="hint">Saves directly to GitHub — site updates in ~30 seconds</span>
+    </div>
+
+    <div class="status" id="status"></div>
+
+  </div>
+</div>
+
+<footer>CoachStage &nbsp;·&nbsp; Drill Importer &nbsp;·&nbsp; Admin only</footer>
+
+<script>
+// ===================== KEYS =====================
+function saveKeys() {
+  const ytKey = document.getElementById('yt-key').value;
+  const ghToken = document.getElementById('gh-token').value;
+  const ghRepo = document.getElementById('gh-repo').value;
+  if (ytKey) { localStorage.setItem('cs_yt_key', ytKey); document.getElementById('yt-key').classList.add('saved'); }
+  if (ghToken) { localStorage.setItem('cs_gh_token', ghToken); document.getElementById('gh-token').classList.add('saved'); }
+  if (ghRepo) localStorage.setItem('cs_gh_repo', ghRepo);
+}
+
+function loadKeys() {
+  const ytKey = localStorage.getItem('cs_yt_key');
+  const ghToken = localStorage.getItem('cs_gh_token');
+  const ghRepo = localStorage.getItem('cs_gh_repo');
+  if (ytKey) { document.getElementById('yt-key').value = ytKey; document.getElementById('yt-key').classList.add('saved'); }
+  if (ghToken) { document.getElementById('gh-token').value = ghToken; document.getElementById('gh-token').classList.add('saved'); }
+  if (ghRepo) document.getElementById('gh-repo').value = ghRepo;
+}
+
+// ===================== YOUTUBE FETCH =====================
+function getYouTubeId(url) {
+  if (!url || typeof url !== 'string') return '';
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  return match ? match[1] : '';
+}
+
+async function fetchVideo() {
+  const url = document.getElementById('yt-url').value.trim();
+  const apiKey = localStorage.getItem('cs_yt_key');
+  const videoId = getYouTubeId(url);
+
+  if (!apiKey) { showStatus('Please enter your YouTube API key in the setup section above.', 'error'); return; }
+  if (!videoId) { showStatus('Please enter a valid YouTube URL.', 'error'); return; }
+
+  const btn = document.getElementById('fetch-btn');
+  btn.textContent = 'Fetching...'; btn.disabled = true;
+
+  try {
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/videos?id=${videoId}&key=${apiKey}&part=snippet,contentDetails`);
+    const data = await res.json();
+
+    if (!data.items || data.items.length === 0) {
+      showStatus('Video not found. Check the URL and try again.', 'error');
+      btn.textContent = 'Fetch Video'; btn.disabled = false;
+      return;
+    }
+
+    const video = data.items[0];
+    const snippet = video.snippet;
+    const duration = parseDuration(video.contentDetails.duration);
+    const thumb = snippet.thumbnails.medium?.url || snippet.thumbnails.default?.url;
+
+    // Show preview
+    document.getElementById('preview-img').src = thumb;
+    document.getElementById('preview-title').textContent = snippet.title;
+    document.getElementById('preview-meta').textContent = `${snippet.channelTitle} · ${duration}`;
+    document.getElementById('video-preview').classList.add('visible');
+
+    // Pre-fill form
+    document.getElementById('f-title').value = snippet.title;
+    document.getElementById('f-time').value = duration;
+
+    // Parse description into fields
+    const desc = snippet.description;
+    const lines = desc.split('\n').filter(l => l.trim());
+    if (lines.length > 0) document.getElementById('f-summary').value = lines.slice(0, 2).join(' ');
+    if (lines.length > 2) document.getElementById('f-objective').value = lines.slice(2, 4).join(' ');
+
+    // Build instructions from description lines
+    clearSteps();
+    const instrLines = lines.slice(0, Math.min(6, lines.length));
+    instrLines.forEach(line => addStep(line));
+
+    // Show form
+    document.getElementById('drill-form').classList.add('visible');
+    document.getElementById('drill-form').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    showStatus('Video fetched! Review and edit the details below, then save.', 'success');
+
+  } catch(e) {
+    showStatus('Error fetching video: ' + e.message, 'error');
+  }
+
+  btn.textContent = 'Fetch Video'; btn.disabled = false;
+}
+
+function parseDuration(iso) {
+  const match = iso.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return '';
+  const h = parseInt(match[1] || 0);
+  const m = parseInt(match[2] || 0);
+  if (h > 0) return `${h}h ${m}min`;
+  return `${m} min`;
+}
+
+// ===================== INSTRUCTIONS =====================
+let stepCount = 0;
+
+function addStep(value = '') {
+  stepCount++;
+  const list = document.getElementById('instructions-list');
+  const row = document.createElement('div');
+  row.className = 'instruction-row';
+  row.id = `step-${stepCount}`;
+  row.innerHTML = `
+    <div class="instruction-num">${list.children.length + 1}</div>
+    <input type="text" value="${value.replace(/"/g, '&quot;')}" placeholder="Step ${list.children.length + 1}...">
+    <button class="remove-btn" onclick="removeStep('step-${stepCount}')">×</button>`;
+  list.appendChild(row);
+  renumberSteps();
+}
+
+function removeStep(id) {
+  document.getElementById(id)?.remove();
+  renumberSteps();
+}
+
+function clearSteps() {
+  document.getElementById('instructions-list').innerHTML = '';
+  stepCount = 0;
+}
+
+function renumberSteps() {
+  document.querySelectorAll('.instruction-row').forEach((row, i) => {
+    row.querySelector('.instruction-num').textContent = i + 1;
+  });
+}
+
+// ===================== SAVE TO GITHUB =====================
+async function saveDrill() {
+  const ghToken = localStorage.getItem('cs_gh_token');
+  const ghRepo = localStorage.getItem('cs_gh_repo');
+  const ytUrl = document.getElementById('yt-url').value.trim();
+
+  if (!ghToken || !ghRepo) { showStatus('Please enter your GitHub token and repo in the setup section.', 'error'); return; }
+
+  const title = document.getElementById('f-title').value.trim();
+  if (!title) { showStatus('Please enter a drill title.', 'error'); return; }
+
+  const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  const filename = `drills/${slug}.md`;
+
+  const steps = Array.from(document.querySelectorAll('.instruction-row input'))
+    .map(i => i.value.trim()).filter(Boolean)
+    .map(s => `  - "${s.replace(/"/g, "'")}"`).join('\n');
+
+  const content = `---
+youtube: "${ytUrl}"
+title: ${title}
+stage: "${document.getElementById('f-stage').value}"
+type: ${document.getElementById('f-type').value}
+time: ${document.getElementById('f-time').value}
+players: ${document.getElementById('f-players').value}
+equipment: ${document.getElementById('f-equipment').value}
+summary: "${document.getElementById('f-summary').value.replace(/"/g, "'")}"
+objective: "${document.getElementById('f-objective').value.replace(/"/g, "'")}"
+setup: "${document.getElementById('f-setup').value.replace(/"/g, "'")}"
+instructions:
+${steps}
+coaching: "${document.getElementById('f-coaching').value.replace(/"/g, "'")}"
+variations: "${document.getElementById('f-variations').value.replace(/"/g, "'")}"
+---`;
+
+  const btn = document.getElementById('save-btn');
+  btn.textContent = 'Saving...'; btn.disabled = true;
+  showStatus('Saving drill to GitHub...', 'loading');
+
+  try {
+    // Check if file already exists to get its SHA
+    let sha = null;
+    const checkRes = await fetch(`https://api.github.com/repos/${ghRepo}/contents/${filename}`, {
+      headers: { 'Authorization': `token ${ghToken}`, 'Accept': 'application/vnd.github.v3+json' }
+    });
+    if (checkRes.ok) {
+      const existing = await checkRes.json();
+      sha = existing.sha;
+    }
+
+    // Save file
+    const body = {
+      message: `Add drill: ${title}`,
+      content: btoa(unescape(encodeURIComponent(content))),
+      branch: 'main'
+    };
+    if (sha) body.sha = sha;
+
+    const saveRes = await fetch(`https://api.github.com/repos/${ghRepo}/contents/${filename}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `token ${ghToken}`,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!saveRes.ok) {
+      const err = await saveRes.json();
+      throw new Error(err.message || 'GitHub API error');
+    }
+
+    showStatus(`✓ Drill "${title}" saved successfully! Your site will update in about 30 seconds.`, 'success');
+    btn.textContent = 'Save drill to site';
+    btn.disabled = false;
+
+  } catch(e) {
+    showStatus('Error saving: ' + e.message, 'error');
+    btn.textContent = 'Save drill to site';
+    btn.disabled = false;
+  }
+}
+
+// ===================== STATUS =====================
+function showStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = `status visible status-${type}`;
+}
+
+// ===================== INIT =====================
+loadKeys();
+addStep('');
+addStep('');
+addStep('');
+</script>
+</body>
+</html>
