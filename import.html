@@ -83,7 +83,7 @@
   .segment { display: flex; background: rgba(26,26,24,0.07); border-radius: 8px; padding: 3px; gap: 2px; }
   .seg { flex: 1; padding: 7px 4px; border-radius: 6px; border: none; background: none; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500; color: var(--ink-muted); cursor: pointer; transition: all .15s; text-align: center; line-height: 1.3; }
   .seg.on { background: white; color: var(--ink); box-shadow: 0 1px 4px rgba(26,26,24,0.12); }
-  .seg.on.s1 { color: var(--stage-1); } .seg.on.s2 { color: var(--stage-2); } .seg.on.s3 { color: var(--stage-3); } .seg.on.s4 { color: var(--stage-4); }
+  .seg.on.s0 { color: var(--ink); } .seg.on.s1 { color: var(--stage-1); } .seg.on.s2 { color: var(--stage-2); } .seg.on.s3 { color: var(--stage-3); } .seg.on.s4 { color: var(--stage-4); }
 
   .presets { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 7px; }
   .preset { padding: 4px 12px; border-radius: 99px; font-size: 12px; border: 1.5px solid rgba(26,26,24,0.14); background: white; color: var(--ink-muted); cursor: pointer; transition: all .12s; }
@@ -194,12 +194,13 @@
     <div class="field">
       <label>Stage</label>
       <div class="segment" id="stage-seg">
-        <button class="seg s1 on" onclick="setStage('1',this)">Foundation<br><span style="font-weight:400;font-size:10px">5–8</span></button>
+        <button class="seg s0 on" onclick="setStage('all',this)">All Ages<br><span style="font-weight:400;font-size:10px">Any</span></button>
+        <button class="seg s1" onclick="setStage('1',this)">Foundation<br><span style="font-weight:400;font-size:10px">5–8</span></button>
         <button class="seg s2" onclick="setStage('2',this)">Development<br><span style="font-weight:400;font-size:10px">9–12</span></button>
-        <button class="seg s3" onclick="setStage('3',this)">Build to Compete<br><span style="font-weight:400;font-size:10px">13–15</span></button>
-        <button class="seg s4" onclick="setStage('4',this)">Train to Compete<br><span style="font-weight:400;font-size:10px">16–18</span></button>
+        <button class="seg s3" onclick="setStage('3',this)">Build<br><span style="font-weight:400;font-size:10px">13–15</span></button>
+        <button class="seg s4" onclick="setStage('4',this)">Compete<br><span style="font-weight:400;font-size:10px">16–18</span></button>
       </div>
-      <input type="hidden" id="f-stage" value="1">
+      <input type="hidden" id="f-stage" value="all">
     </div>
     <div class="field">
       <label>Type</label>
@@ -334,10 +335,11 @@
 <script>
 let selectedEq = new Set();
 let stepCount = 0;
-let currentStage = '1';
+let currentStage = 'all';
 let currentType = 'skill';
 
 const stageColors = {
+  'all':{ color:'var(--ink)', bg:'rgba(26,26,24,0.06)', border:'rgba(26,26,24,0.2)', label:'All Ages' },
   '1':{ color:'var(--stage-1)', bg:'var(--stage-1-bg)', border:'var(--stage-1-border)', label:'Stage 1' },
   '2':{ color:'var(--stage-2)', bg:'var(--stage-2-bg)', border:'var(--stage-2-border)', label:'Stage 2' },
   '3':{ color:'var(--stage-3)', bg:'var(--stage-3-bg)', border:'var(--stage-3-border)', label:'Stage 3' },
