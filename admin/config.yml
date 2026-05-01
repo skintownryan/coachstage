@@ -12,6 +12,7 @@ collections:
     create: true
     slug: "{{slug}}"
     fields:
+      - { label: "YouTube Video URL", name: "youtube", widget: "string", required: false, hint: "Paste the full YouTube URL e.g. https://www.youtube.com/watch?v=xxxxx" }
       - { label: "Title", name: "title", widget: "string" }
       - label: "Stage"
         name: "stage"
@@ -41,4 +42,3 @@ collections:
         field: { label: "Step", name: "step", widget: "string" }
       - { label: "Coaching Notes", name: "coaching", widget: "text" }
       - { label: "Variations", name: "variations", widget: "text" }
-      - { label: "YouTube Video URL", name: "youtube", widget: "string", required: false, hint: "Paste the full YouTube URL e.g. https://www.youtube.com/watch?v=xxxxx" }
