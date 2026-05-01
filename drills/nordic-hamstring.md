@@ -1,5 +1,5 @@
 ---
-youtube: ""
+youtube: "https://www.youtube.com/watch?v=F-AaE8mw_pY"
 title: Nordic Hamstring Curls
 stage: "3"
 type: physical

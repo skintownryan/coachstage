@@ -1,5 +1,5 @@
 ---
-youtube: ""
+youtube: "https://www.youtube.com/watch?v=nYzZdKVl3bA"
 title: Freeze Tag
 stage: "1"
 type: game

@@ -1,5 +1,5 @@
 ---
-youtube: ""
+youtube: "https://www.youtube.com/watch?v=rNih_5ZY8SQ"
 title: Traffic Lights
 stage: "1"
 type: game

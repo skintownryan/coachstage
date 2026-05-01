@@ -1,5 +1,5 @@
 ---
-youtube: ""
+youtube: "https://www.youtube.com/watch?v=-5nQMKW79Ug"
 title: Wall Passes Rondo
 stage: "2"
 type: skill
