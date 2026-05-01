@@ -1,0 +1,43 @@
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "images"
+public_folder: "/images"
+
+collections:
+  - name: "drills"
+    label: "Drills"
+    folder: "drills"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - label: "Stage"
+        name: "stage"
+        widget: "select"
+        options:
+          - { label: "Stage 1 — Foundation (5–8)", value: "1" }
+          - { label: "Stage 2 — Development (9–12)", value: "2" }
+          - { label: "Stage 3 — Build to Compete (13–15)", value: "3" }
+          - { label: "Stage 4 — Train to Compete (16–18)", value: "4" }
+      - label: "Type"
+        name: "type"
+        widget: "select"
+        options:
+          - { label: "Skill", value: "skill" }
+          - { label: "Physical", value: "physical" }
+          - { label: "Game", value: "game" }
+          - { label: "Mental", value: "mental" }
+      - { label: "Duration", name: "time", widget: "string", hint: "e.g. 20 min" }
+      - { label: "Players", name: "players", widget: "string", hint: "e.g. 8–16" }
+      - { label: "Equipment", name: "equipment", widget: "string", hint: "e.g. Cones, balls" }
+      - { label: "Summary", name: "summary", widget: "text", hint: "One or two sentences shown on the drill card" }
+      - { label: "Objective", name: "objective", widget: "text" }
+      - { label: "Setup", name: "setup", widget: "text" }
+      - label: "Instructions"
+        name: "instructions"
+        widget: "list"
+        field: { label: "Step", name: "step", widget: "string" }
+      - { label: "Coaching Notes", name: "coaching", widget: "text" }
+      - { label: "Variations", name: "variations", widget: "text" }
