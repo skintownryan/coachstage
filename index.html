@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CoachStage — Youth Athlete Development</title>
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -592,46 +593,93 @@
 </footer>
 
 <script>
-// ===================== DATA =====================
-const drills = [
-  { id:1, stage:1, type:'game', title:'Traffic Lights', time:'10 min', players:'6–20', equipment:'None', summary:'A classic movement game where the coach calls colours to control speed — stop, walk, jog, sprint. Develops listening, reaction time, and basic locomotion.', objective:'Develop listening skills, reaction time, and basic locomotion patterns in a fun, pressure-free format.', setup:'Mark out a large playing area. Athletes spread out and move freely.', instructions:['Coach calls "Red" — everyone stops immediately.','Coach calls "Amber" — everyone walks.','Coach calls "Green" — everyone runs freely.','Add variations: "Blue" = hop on one leg, "Purple" = skip.','Last one to respond correctly sits out for 10 seconds then rejoins.'], coaching:'Keep the pace unpredictable and fun. Praise quick reactions with enthusiasm. Make errors feel safe — laugh about them.', variations:'Add directional calls. Use cones as colour zones. Let an athlete be the caller.' },
-  { id:2, stage:1, type:'skill', title:'Bean Bag Toss & Chase', time:'15 min', players:'4–16', equipment:'Bean bags or balls', summary:'Athletes throw a bean bag, chase it, pick it up, and repeat. Develops throwing mechanics, chasing, and basic hand-eye coordination.', objective:'Develop basic throwing patterns and hand-eye coordination through self-paced exploration.', setup:'Athletes stand behind a line with a bean bag each. Large open space.', instructions:['Athlete throws bean bag as far as they can.','They run and collect it.','Return to the line and repeat.','Progress: underarm, overarm, with non-dominant hand, throwing at a target.'], coaching:'Focus on movement quality not distance. Praise effort. Avoid correcting too much — let them discover.', variations:'Partner throws. Target practice. Throw and touch the floor before collecting.' },
-  { id:3, stage:1, type:'game', title:'Freeze Tag', time:'10 min', players:'8–25', equipment:'Bibs', summary:'Classic tag game with a twist — frozen players can be freed by teammates. Builds running, dodging, spatial awareness, and basic cooperation.', objective:'Develop evasion, spatial awareness, and introduce a simple team concept through play.', setup:'Mark a large area. 2–3 taggers wear bibs.', instructions:['Taggers try to freeze players by touching them.','Frozen players stand still with arms out.','Free players can unfreeze frozen ones by high-fiving them.','Rotate taggers every 2–3 minutes.'], coaching:'Keep it joyful. Step in as a tagger yourself occasionally to make it exciting. Celebrate unfreezing as a hero moment.', variations:'Two-touch freeze. Safe zones. Add a frozen countdown.' },
-  { id:4, stage:1, type:'skill', title:'Ladder and Hurdle Relay', time:'20 min', players:'6–20', equipment:'Agility ladder, low hurdles or cones', summary:'Simple agility stations where athletes run through a ladder and over hurdles before tagging the next person. Develops footwork and basic coordination.', objective:'Introduce agility ladder footwork and hurdle coordination through simple relay competition.', setup:'Set up a short agility ladder and 3–4 low hurdles in a line.', instructions:['Athletes split into small teams.','One at a time: run through the ladder (one foot per space), jump over hurdles, sprint back.','Tag next teammate to go.','Rotate through several times.'], coaching:'Focus on fun and rhythm, not perfect footwork. Celebrate completion, not speed. Keep teams small so athletes get many turns.', variations:'Different ladder patterns. Different hurdle heights. Add a dribble or carry.' },
-  { id:5, stage:2, type:'skill', title:'Wall Passes — Rondo', time:'20 min', players:'8–16', equipment:'Balls, cones', summary:'A small-sided possession game where athletes must connect passes and maintain possession against pressure. Develops passing accuracy, decision-making, and movement off the ball.', objective:'Develop quick passing, support play, and decision-making under light pressure.', setup:'Mark a 10m x 10m square. 6v2 to start.', instructions:['Outer players maintain possession.','Two players in the middle try to win the ball.','If the middle wins it, the player who lost swaps in.','Progress to 5v2, then 4v2 as skill improves.'], coaching:'Ask "why" questions: "Why did you pass there?" Keep interventions short. Let the game teach.', variations:'Limit touches. Play with one-touch. Add a neutral player who is always with the team in possession.' },
-  { id:6, stage:2, type:'physical', title:'Sprint & Deceleration Intervals', time:'20 min', players:'Any', equipment:'Cones', summary:'Short sprint efforts with controlled deceleration and recovery. Develops speed mechanics, acceleration, and the often-neglected ability to stop quickly.', objective:'Develop acceleration, max speed, and safe deceleration under control.', setup:'Cones at 0m, 15m, and 25m.', instructions:['Athletes start at 0m.','Sprint to 15m at full effort.','Decelerate and stop under control by 25m.','Walk back — full recovery.','8–10 reps, 2 sets.'], coaching:'Watch for forward lean on acceleration. Praise controlled stops — deceleration is a skill and injury prevention tool.', variations:'Flying starts. Reaction start on coach signal. Partner races (keep competitive and fun).' },
-  { id:7, stage:2, type:'game', title:'Four Goal Chaos', time:'25 min', players:'8–16', equipment:'4 sets of small goals or cones, bibs', summary:'Two teams compete to score in any of the four goals scattered around the pitch. Develops vision, spatial awareness, communication, and constant decision-making.', objective:'Develop scanning ability, communication, and decision-making in a chaotic environment.', setup:'Place 4 small goals (or cone pairs) randomly across a large area. Split into 2 equal teams.', instructions:['Both teams can attack and defend any goal.','Normal rules apply.','Coach varies goal sizes and numbers to change the challenge.','Play for 5-minute rounds.'], coaching:'Let them figure it out. The chaos is the point. Ask questions at rest — "which goal had space?", "who was free?".', variations:'3 goals each team. Limit touches in certain zones. Add conditions like must pass before shooting.' },
-  { id:8, stage:2, type:'skill', title:'Hitting the Wall — Rapid Repetition', time:'20 min', players:'Any (individual or paired)', equipment:'Ball, wall or rebounder', summary:'Athletes perform rapid-fire repetitions against a wall, developing touch, reaction time, and technical consistency under fatigue.', objective:'Build technical consistency and quick reactions through high-volume repetition.', setup:'Athletes stand 3–5m from a wall with a ball.', instructions:['Strike/throw the ball against the wall continuously.','Goal: maintain technique as speed increases.','30 seconds on, 15 seconds rest.','5–8 rounds.'], coaching:'Give one technical cue per round only. Watch for fatigue-driven technique breakdown — that is the learning moment.', variations:'Vary distance. Alternate feet/hands. Add targets on the wall.' },
-  { id:9, stage:3, type:'physical', title:'Nordic Hamstring Curls', time:'15 min', players:'Any (pairs needed)', equipment:'Mat or grass', summary:'A partner-assisted eccentric hamstring exercise that is one of the most effective injury prevention tools available. Essential for reducing ACL and hamstring strain risk in adolescents.', objective:'Develop eccentric hamstring strength to reduce injury risk during rapid growth phase.', setup:'Athletes kneel on a mat. Partner holds their ankles firmly to the ground.', instructions:['From kneeling, athlete lowers their body forward as slowly as possible.','When they can no longer control the descent, they catch themselves with their hands.','Push back up using their hands, then use hamstrings to pull back to upright.','3 sets of 5–8 reps.','Progress reps as strength develops.'], coaching:'Expect this to feel hard immediately — that is correct. The slow lowering phase is where the benefit is. Never rush it.', variations:'Start with fewer reps if too difficult. Elevate the hands on a box to reduce range. Add a resistance band to assist.' },
-  { id:10, stage:3, type:'game', title:'Transition 5v5', time:'30 min', players:'10+', equipment:'Goals, bibs', summary:'A small-sided game with a deliberate transition element — teams must get all players over a line before they can attack. Develops pressing, defensive organisation, and attacking transition.', objective:'Develop defensive shape and attacking transition speed and decision-making.', setup:'Standard small-sided area. Mark a halfway line. Two equal teams.', instructions:['When a team wins possession, all players must get over the halfway line before they can score.','Defending team presses to prevent this.','Play 5-minute rounds with tactical discussion between.','Losing team does a fun challenge (5 burpees, not punitive).'], coaching:'Pause play to highlight organisation. Ask attackers: "What were your options?" Ask defenders: "What shape did you want?"', variations:'Change the distance of the recovery line. Add a third team waiting. Count transition goals as double.' },
-  { id:11, stage:3, type:'skill', title:'Pressure Skill Circuit', time:'25 min', players:'Any', equipment:'Sport-specific equipment, cones, stopwatch', summary:'Athletes perform their key technical skill under increasing time and fatigue pressure. Develops the ability to execute when tired and stressed — a critical bridge between training and competition.', objective:'Execute technical skills under physical and time pressure to simulate competition demands.', setup:'Set up 4 stations with sport-specific skills. 45 seconds per station, 15 seconds transition.', instructions:['Station 1: Technical skill at own pace (warm-up).','Station 2: Same skill but with a time target (e.g. 10 in 30 seconds).','Station 3: Skill after 6 shuttle runs (fatigue).','Station 4: Skill under pressure from a partner.'], coaching:'Discuss how technique changed under each condition. Make this explicit — awareness of pressure response is itself a skill.', variations:'Increase fatigue element. Add cognitive tasks (maths questions mid-drill). Introduce distracting noise.' },
-  { id:12, stage:3, type:'mental', title:'Mistake Recovery Protocol', time:'15 min', players:'Any', equipment:'None', summary:'A structured discussion and practice session teaching athletes how to mentally recover from errors quickly. Develops emotional regulation and resilience.', objective:'Build a deliberate post-error mental reset routine that athletes can use in competition.', setup:'Circle or team meeting format. Can be done sitting or standing.', instructions:['Discuss: what happens in your body when you make a mistake mid-game?','Introduce the "3-step reset": breathe out slowly, physical reset gesture (clap, shake hands), set next action clearly.','Pair athletes: one performs a skill, makes an intentional error, practises the reset.','Repeat until reset feels natural.'], coaching:'Share your own experiences of handling mistakes. Normalise errors as part of the process. This conversation is as valuable as the exercise.', variations:'Use real match footage of elite athletes resetting. Role-play specific scenarios from recent matches.' },
-  { id:13, stage:4, type:'physical', title:'Maximum Velocity Sprint Development', time:'30 min', players:'Any', equipment:'Cones, timing gates if available', summary:'A structured session developing top-end sprint speed through flying sprints and acceleration blocks. Athletes at this stage are ready to push true maximum velocity work.', objective:'Develop maximum sprint velocity with appropriate recovery to ensure quality of effort.', setup:'Mark 10m, 20m, and 40m distances. Full recovery between efforts (2–3 min).', instructions:['Warm-up: progressive runs at 60%, 75%, 90% over 40m.','Flying 30s: 20m run-up, then maximum effort for 30m. 3 sets.','Full recovery between every run — quality over quantity.','Cooldown: easy jog, stretching.'], coaching:'Full recovery is non-negotiable. Emphasise relaxed speed — jaw loose, hands relaxed. Quality of sprint mechanics matters more than time.', variations:'Add resistance (sled or band) on some reps for contrast training. Measure and track velocity over the programme.' },
-  { id:14, stage:4, type:'skill', title:'Position-Specific Decision Rondo', time:'25 min', players:'8–14', equipment:'Balls, cones', summary:'A rondo (possession game) where each player is assigned a specific positional role and must make decisions consistent with that role. Develops positional intelligence and game-model understanding.', objective:'Develop position-specific decision-making within a team game model.', setup:'Standard rondo setup. Each player assigned a positional identity (striker, midfielder, defender, etc.).', instructions:['Play standard possession rondo.','Each player must make decisions in line with their role — defenders win ball and play safe, strikers take risks, etc.','Coach gives one cue per player only.','Rotate roles every 10 minutes.'], coaching:'Focus the debrief on whether decisions matched the role. Build a shared language: "as a striker here, what did you want to do?"', variations:'Overload specific positions. Add a game model constraint (e.g. always play forward first). Link to recent match footage.' },
-  { id:15, stage:4, type:'mental', title:'Pre-Competition Routine Workshop', time:'40 min', players:'Any', equipment:'Whiteboard or paper', summary:'A workshop where athletes build their own personalised pre-competition routine covering physical warm-up, mental focus, and confidence triggers. Develops psychological readiness as a trainable skill.', objective:'Build an individualised pre-competition mental and physical routine that athletes own and can repeat.', setup:'Relaxed environment. Whiteboard or individual paper.', instructions:['Discuss: what does your best performance feel like? What were you thinking before it?','Identify 2–3 confidence triggers (a moment, a feeling, a phrase).','Design a routine: physical activation + focus phrase + last image/cue.','Practise the routine together.','Athletes write their routine on a card to keep.'], coaching:'Make it personal — there is no correct routine. Facilitate, do not prescribe. A routine only works if the athlete believes in it.', variations:'Video athletes describing their routine (great for reflection). Revisit and refine after competition.' },
-  { id:16, stage:4, type:'game', title:'Conditioned Game with Self-Referee', time:'35 min', players:'10+', equipment:'Goals, bibs', summary:'A full small-sided game where athletes referee themselves and handle disputes without coach intervention. Develops autonomy, communication, game sense, and preparation for adult sport.', objective:'Develop athlete autonomy, communication, and self-regulation within a competitive environment.', setup:'Standard game setup. Coach establishes ground rules and watches without intervening in disputes.', instructions:['Athletes play a normal small-sided game.','All refereeing decisions are made by players.','Coach only intervenes for safety.','Game stops every 10 min for an athlete-led debrief — not coach-led.'], coaching:'Resist every instinct to intervene. Observe patterns. Use the athlete-led debriefs to reflect back what you observed.', variations:'Add a tactical condition. Award bonus points for good decision-making. Record and review as a team.' }
-];
-
+// ===================== DATA — loaded from CMS files =====================
+let allDrills = [];
 let activeStageFilter = 'all';
 let activeTypeFilter = 'all';
+
+function parseFrontmatter(text) {
+  const match = text.match(/^---\n([\s\S]*?)\n---/);
+  if (!match) return null;
+  const fm = {};
+  const lines = match[1].split('\n');
+  let currentKey = null;
+  let inList = false;
+  lines.forEach(line => {
+    const keyMatch = line.match(/^(\w+):\s*(.*)/);
+    if (keyMatch) {
+      currentKey = keyMatch[1];
+      const val = keyMatch[2].trim().replace(/^["']|["']$/g, '');
+      if (val === '') { fm[currentKey] = []; inList = true; }
+      else { fm[currentKey] = val; inList = false; }
+    } else if (inList && line.match(/^\s*-\s+(.*)/)) {
+      const item = line.match(/^\s*-\s+(.*)/)[1].trim().replace(/^["']|["']$/g, '');
+      if (!Array.isArray(fm[currentKey])) fm[currentKey] = [];
+      fm[currentKey].push(item);
+    }
+  });
+  return fm;
+}
+
+async function loadDrills() {
+  const grid = document.getElementById('drill-grid');
+  grid.innerHTML = '<p style="color:var(--ink-muted);font-size:14px;padding:40px 0;text-align:center;">Loading drills...</p>';
+  try {
+    const indexRes = await fetch('/drills/index.json');
+    if (!indexRes.ok) throw new Error('no index');
+    const index = await indexRes.json();
+    const fetches = index.map(filename =>
+      fetch('/drills/' + filename).then(r => r.text()).then(text => {
+        const fm = parseFrontmatter(text);
+        if (!fm) return null;
+        return {
+          id: filename,
+          title: fm.title || '',
+          stage: parseInt(fm.stage) || 1,
+          type: fm.type || 'skill',
+          time: fm.time || '',
+          players: fm.players || '',
+          equipment: fm.equipment || '',
+          summary: fm.summary || '',
+          objective: fm.objective || '',
+          setup: fm.setup || '',
+          instructions: Array.isArray(fm.instructions) ? fm.instructions : [],
+          coaching: fm.coaching || '',
+          variations: fm.variations || '',
+        };
+      }).catch(() => null)
+    );
+    const results = await Promise.all(fetches);
+    allDrills = results.filter(Boolean);
+  } catch(e) {
+    allDrills = [];
+  }
+  renderDrills();
+}
 
 function renderDrills() {
   const grid = document.getElementById('drill-grid');
   const noRes = document.getElementById('no-results');
-  const filtered = drills.filter(d => {
+  if (allDrills.length === 0) {
+    grid.innerHTML = '';
+    noRes.style.display = 'block';
+    noRes.innerHTML = '<p>No drills yet — <a href="/admin" style="color:var(--stage-2);">add your first drill in the admin panel</a>.</p>';
+    return;
+  }
+  const filtered = allDrills.filter(d => {
     const matchStage = activeStageFilter === 'all' || String(d.stage) === activeStageFilter;
     const matchType = activeTypeFilter === 'all' || d.type === activeTypeFilter;
     return matchStage && matchType;
   });
-  if (filtered.length === 0) { grid.innerHTML = ''; noRes.style.display='block'; return; }
+  if (filtered.length === 0) { grid.innerHTML = ''; noRes.style.display='block'; noRes.innerHTML='<p>No drills match that filter combination.</p>'; return; }
   noRes.style.display = 'none';
   const typeLabel = {skill:'Skill',physical:'Physical',game:'Game',mental:'Mental'};
   const stageLabel = {1:'Stage 1',2:'Stage 2',3:'Stage 3',4:'Stage 4'};
   grid.innerHTML = filtered.map(d => `
-    <div class="drill-card" onclick="openDrill(${d.id})">
+    <div class="drill-card" onclick="openDrill('${d.id}')">
       <div class="drill-meta">
         <span class="drill-stage-badge dsb-${d.stage}">${stageLabel[d.stage]}</span>
-        <span class="drill-type-badge">${typeLabel[d.type]}</span>
+        <span class="drill-type-badge">${typeLabel[d.type] || d.type}</span>
       </div>
       <h3>${d.title}</h3>
       <p>${d.summary}</p>
@@ -661,13 +709,13 @@ function filterType(val, btn) {
 }
 
 function openDrill(id) {
-  const d = drills.find(x => x.id === id);
-  const stageColors = {1:'var(--stage-1)',2:'var(--stage-2)',3:'var(--stage-3)',4:'var(--stage-4)'};
+  const d = allDrills.find(x => x.id === id);
+  if (!d) return;
   const typeLabel = {skill:'Skill drill',physical:'Physical training',game:'Game / activity',mental:'Mental skills'};
   document.getElementById('modal-body').innerHTML = `
     <div class="drill-meta" style="margin-bottom:12px;">
       <span class="drill-stage-badge dsb-${d.stage}">Stage ${d.stage}</span>
-      <span class="drill-type-badge">${typeLabel[d.type]}</span>
+      <span class="drill-type-badge">${typeLabel[d.type] || d.type}</span>
     </div>
     <h2>${d.title}</h2>
     <p class="modal-sub">⏱ ${d.time} &nbsp;·&nbsp; 👥 ${d.players} &nbsp;·&nbsp; 🎯 ${d.equipment}</p>
@@ -715,7 +763,13 @@ function goToStage(n) {
 }
 
 // ===================== INIT =====================
-renderDrills();
+loadDrills();
+
+if (window.netlifyIdentity) {
+  window.netlifyIdentity.on('init', user => {
+    if (!user) window.netlifyIdentity.on('login', () => document.location.href = '/admin/');
+  });
+}
 </script>
 </body>
 </html>
