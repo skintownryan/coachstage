@@ -1,16 +1,17 @@
 ---
-youtube: "https://www.youtube.com/watch?v=TZPHg7F3G7I&pp=ygUOZmx5aW5nIHNwcmludHM%3D"
+youtube: https://www.youtube.com/watch?v=TZPHg7F3G7I&pp=ygUOZmx5aW5nIHNwcmludHM%3D
 title: Flying Sprints
-stage: "1"
+stage: "4"
 type: physical
 time: 5-10
-players: 
+players: Any
 equipment: cones
-summary: ""
-objective: ""
-setup: ""
+summary: Speed drill
+objective: Max Velocity
+setup: Cones at distances
 instructions:
-
-coaching: ""
-variations: ""
+  - Build speed for first portion
+  - Aim for max velocity
+coaching: Upright
+variations: "-"
 ---
