@@ -676,8 +676,12 @@ function renderDrills() {
   noRes.style.display = 'none';
   const typeLabel = {skill:'Skill',physical:'Physical',game:'Game',mental:'Mental'};
   const stageLabel = {1:'Stage 1',2:'Stage 2',3:'Stage 3',4:'Stage 4'};
-  grid.innerHTML = filtered.map(d => `
+  grid.innerHTML = filtered.map(d => {
+    const ytId = d.youtube ? getYouTubeId(d.youtube) : null;
+    const thumb = ytId ? `<div style="position:relative;width:100%;padding-bottom:56.25%;margin-bottom:14px;border-radius:8px;overflow:hidden;background:#E8E4DC;"><img src="https://img.youtube.com/vi/${ytId}/mqdefault.jpg" style="position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;" loading="lazy"><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><div style="width:44px;height:44px;background:rgba(0,0,0,0.7);border-radius:50%;display:flex;align-items:center;justify-content:center;"><svg width="16" height="16" viewBox="0 0 16 16" fill="white"><polygon points="5,3 13,8 5,13"/></svg></div></div></div>` : '';
+    return `
     <div class="drill-card" onclick="openDrill('${d.id}')">
+      ${thumb}
       <div class="drill-meta">
         <span class="drill-stage-badge dsb-${d.stage}">${stageLabel[d.stage]}</span>
         <span class="drill-type-badge">${typeLabel[d.type] || d.type}</span>
@@ -689,7 +693,8 @@ function renderDrills() {
         <span class="drill-stat">👥 ${d.players}</span>
         <span class="drill-stat">🎯 ${d.equipment}</span>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function filterDrills(val, btn) {
